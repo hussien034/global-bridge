@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nileGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E64B0"/>
+      <stop offset="100%" stop-color="#07549A"/>
+    </linearGradient>
+    <linearGradient id="goldGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D99B00"/>
+      <stop offset="100%" stop-color="#F4B400"/>
+    </linearGradient>
+    <filter id="shadow3" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#07549A" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="600" height="240" rx="16" fill="#FFFDF8"/>
+  <rect width="598" height="238" x="1" y="1" rx="15" fill="none" stroke="#EAE4D9" stroke-width="1.5"/>
+
+  <!-- Mark: Egypt Nexus & Global Convergence Portal -->
+  <g transform="translate(45, 45)" filter="url(#shadow3)">
+    <!-- Outer Orbit Ring (World Reach) -->
+    <path d="M 75 10 A 65 65 0 0 1 140 75 A 65 65 0 0 1 85 140" 
+          fill="none" stroke="#10233F" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 10"/>
+    
+    <!-- Middle Connectivity Wave (Europe & Americas Bridge Arc) -->
+    <path d="M 20 85 A 55 55 0 0 1 75 20 A 55 55 0 0 1 130 75" 
+          fill="none" stroke="url(#nileGrad3)" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Inner Golden Acceleration Loop (Egypt Innovation Core) -->
+    <path d="M 45 75 A 30 30 0 0 0 75 105 A 30 30 0 0 0 105 75 A 30 30 0 0 0 75 45" 
+          fill="none" stroke="url(#goldGrad3)" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Center Tech Core Nexus (Cairo Point) -->
+    <circle cx="75" cy="75" r="14" fill="#07549A"/>
+    <circle cx="75" cy="75" r="7" fill="#F4B400"/>
+
+    <!-- Orbital Satellites (Remote Nodes) -->
+    <circle cx="130" cy="75" r="5" fill="#10233F"/>
+    <circle cx="75" cy="20" r="5" fill="#F4B400"/>
+    <circle cx="85" cy="140" r="4" fill="#07549A"/>
+  </g>
+
+  <!-- Brand Typography -->
+  <g transform="translate(225, 82)">
+    <!-- Direction Badge -->
+    <rect x="0" y="-28" width="195" height="22" rx="11" fill="#EBF3FB"/>
+    <text x="12" y="-13" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#07549A" letter-spacing="1">DIRECTION 03 • NEXUS PORTAL</text>
+
+    <!-- Main Wordmark -->
+    <text x="0" y="32" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="36" font-weight="800" fill="#10233F" letter-spacing="-0.5">
+      GLOBAL<tspan dx="10" fill="#07549A" font-weight="600">BRIDGE</tspan>
+    </text>
+
+    <!-- Tagline & Description -->
+    <text x="2" y="65" font-family="'Cairo', system-ui, sans-serif" font-size="18" font-weight="700" fill="#07549A">
+      منصة الربط الدولي للكفاءات التقنية
+    </text>
+    
+    <text x="2" y="90" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+      Global Remote Engineering Network for Egypt
+    </text>
+  </g>
+</svg>

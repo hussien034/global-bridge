@@ -1,0 +1,1 @@
+ALTER TABLE `partnership_leads` ADD `request_type` text DEFAULT 'partnership' NOT NULL;

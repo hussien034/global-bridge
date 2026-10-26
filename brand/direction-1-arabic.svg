@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nileGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E64B0"/>
+      <stop offset="100%" stop-color="#07549A"/>
+    </linearGradient>
+    <linearGradient id="goldGrad1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D99B00"/>
+      <stop offset="50%" stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#FFD15C"/>
+    </linearGradient>
+    <filter id="shadow1" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#07549A" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="600" height="240" rx="16" fill="#FFFDF8"/>
+  <rect width="598" height="238" x="1" y="1" rx="15" fill="none" stroke="#EAE4D9" stroke-width="1.5"/>
+
+  <!-- Mark: Arabic-Forward Monogram (جسر + Route) -->
+  <g transform="translate(40, 45)" filter="url(#shadow1)">
+    <!-- Main Kufic Architectural Structure of "جسر" -->
+    <!-- Base foundation -->
+    <path d="M 10 120 L 130 120 C 138 120 144 114 144 106 L 144 85 C 144 77 138 71 130 71 L 65 71 C 55 71 50 65 50 55 L 50 35 C 50 25 58 18 68 18 L 130 18" 
+          fill="none" stroke="url(#nileGrad1)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Vertical Anchor Pillar (Nile Pillar) -->
+    <line x1="28" y1="35" x2="28" y2="110" stroke="url(#nileGrad1)" stroke-width="14" stroke-linecap="round"/>
+    
+    <!-- Golden Bridge Arc (The Ascending Path - العبور) -->
+    <path d="M 20 110 Q 75 15 145 28" 
+          fill="none" stroke="url(#goldGrad1)" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Dynamic Orbit Terminal Dot -->
+    <circle cx="145" cy="28" r="7" fill="#F4B400"/>
+    <circle cx="145" cy="28" r="3.5" fill="#FFFDF8"/>
+    
+    <!-- Arabic Nuqta / Focal Dot (نقطة الجيم الهندسية) -->
+    <rect x="80" y="86" width="13" height="13" rx="3" transform="rotate(45 86 92)" fill="url(#goldGrad1)"/>
+  </g>
+
+  <!-- Brand Typography -->
+  <g transform="translate(225, 85)">
+    <!-- Direction Badge -->
+    <rect x="0" y="-30" width="185" height="22" rx="11" fill="#EBF3FB"/>
+    <text x="12" y="-15" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#07549A" letter-spacing="1">DIRECTION 01 • ARABIC MARK</text>
+
+    <!-- Main Wordmark -->
+    <text x="0" y="32" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="34" font-weight="800" fill="#10233F" letter-spacing="-0.5">
+      GLOBAL<tspan dx="10" fill="#07549A" font-weight="600">BRIDGE</tspan>
+    </text>
+    
+    <!-- Arabic Calligraphic Subtitle -->
+    <text x="2" y="65" font-family="'Cairo', system-ui, sans-serif" font-size="19" font-weight="700" fill="#F4B400" letter-spacing="0.5">
+      جسر العالمية للمواهب
+    </text>
+    
+    <!-- Tagline -->
+    <text x="2" y="90" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+      Egyptian Tech Talents. Global Remote Careers.
+    </text>
+  </g>
+</svg>

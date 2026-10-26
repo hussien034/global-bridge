@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nileGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#053A6D"/>
+      <stop offset="60%" stop-color="#07549A"/>
+      <stop offset="100%" stop-color="#0A72CE"/>
+    </linearGradient>
+    <linearGradient id="goldGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D99B00"/>
+      <stop offset="60%" stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#FFE082"/>
+    </linearGradient>
+    <linearGradient id="beamGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F4B400" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#F4B400" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#07549A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="600" height="240" rx="16" fill="#FFFDF8"/>
+  <rect width="598" height="238" x="1" y="1" rx="15" fill="none" stroke="#EAE4D9" stroke-width="1.5"/>
+
+  <!-- Mark: Dual Bridge Arcs + Ascending Golden Route -->
+  <g transform="translate(45, 42)" filter="url(#cardShadow)">
+    <!-- Base Gateway Anchor / River Horizon (Nile Horizon) -->
+    <path d="M 12 118 L 138 118" stroke="#10233F" stroke-opacity="0.15" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Left Bridge Pylon / Arc 1 (Primary Tower) -->
+    <path d="M 24 118 C 24 65, 45 32, 75 32 C 90 32, 102 45, 108 65" 
+          fill="none" stroke="url(#nileGrad2)" stroke-width="13" stroke-linecap="round"/>
+
+    <!-- Right Intersecting Span / Arc 2 (Global Span) -->
+    <path d="M 68 118 C 72 75, 96 48, 126 48 C 134 48, 140 54, 142 62" 
+          fill="none" stroke="#10233F" stroke-width="10" stroke-linecap="round" stroke-opacity="0.85"/>
+
+    <!-- Suspension Cables (Subtle Geometric Precision) -->
+    <line x1="45" y1="52" x2="45" y2="115" stroke="#07549A" stroke-opacity="0.25" stroke-width="2"/>
+    <line x1="65" y1="40" x2="65" y2="115" stroke="#07549A" stroke-opacity="0.25" stroke-width="2"/>
+    <line x1="90" y1="52" x2="90" y2="115" stroke="#07549A" stroke-opacity="0.25" stroke-width="2"/>
+    <line x1="110" y1="68" x2="110" y2="115" stroke="#07549A" stroke-opacity="0.25" stroke-width="2"/>
+
+    <!-- The Golden Opportunity Route (العبور والمسار الصاعد) -->
+    <path d="M 10 102 C 45 98, 70 82, 110 40 L 140 16" 
+          fill="none" stroke="url(#goldGrad2)" stroke-width="9" stroke-linecap="round"/>
+    
+    <!-- Pulse / Target Terminal Beacon -->
+    <circle cx="140" cy="16" r="8" fill="#F4B400"/>
+    <circle cx="140" cy="16" r="4" fill="#FFFFFF"/>
+    
+    <!-- Origin Anchor (Egypt Node) -->
+    <circle cx="10" cy="102" r="5" fill="#D99B00"/>
+  </g>
+
+  <!-- Brand Typography -->
+  <g transform="translate(225, 82)">
+    <!-- Direction Badge -->
+    <rect x="0" y="-28" width="220" height="22" rx="11" fill="#FEF7E6"/>
+    <text x="12" y="-13" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#D99B00" letter-spacing="1">DIRECTION 02 • BRIDGE + ROUTE (RECOMMENDED)</text>
+
+    <!-- Main Wordmark -->
+    <text x="0" y="32" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="36" font-weight="800" fill="#10233F" letter-spacing="-0.5">
+      GLOBAL<tspan dx="10" fill="#07549A" font-weight="600">BRIDGE</tspan>
+    </text>
+
+    <!-- Golden Brand Dot -->
+    <circle cx="308" cy="16" r="6" fill="#F4B400"/>
+    
+    <!-- Bilingual Tagline / Subtitle -->
+    <text x="2" y="65" font-family="'Cairo', system-ui, sans-serif" font-size="18" font-weight="700" fill="#07549A">
+      جسر المواهب التقنية المصرية
+    </text>
+    
+    <text x="2" y="90" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+      Connecting Egypt's Top Tech Talent with Global Companies
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 110" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hdNile" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0E64B0"/>
+      <stop offset="60%" stop-color="#2A85DF"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+    <linearGradient id="hdGold" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E5A100"/>
+      <stop offset="60%" stop-color="#F4B400"/>
+      <stop offset="100%" stop-color="#FFE58F"/>
+    </linearGradient>
+    <filter id="hdGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#2A85DF" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Dark Background Container -->
+  <rect width="460" height="110" rx="12" fill="#0A1424"/>
+  <rect width="458" height="108" x="1" y="1" rx="11" fill="none" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- Visual Bridge Mark (Glow for Dark Mode) -->
+  <g transform="translate(18, 10)">
+    <!-- Base Nile Horizon -->
+    <path d="M 8 78 L 92 78" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Main Bridge Tower Arc -->
+    <path d="M 18 78 C 18 42, 32 20, 52 20 C 62 20, 70 28, 74 42" 
+          fill="none" stroke="url(#hdNile)" stroke-width="9" stroke-linecap="round" filter="url(#hdGlow)"/>
+
+    <!-- Secondary Intersecting Span -->
+    <path d="M 48 78 C 50 48, 66 30, 85 30 C 90 30, 94 34, 96 40" 
+          fill="none" stroke="#94A3B8" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Structural Precision Lines -->
+    <line x1="32" y1="35" x2="32" y2="76" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1.5"/>
+    <line x1="46" y1="26" x2="46" y2="76" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1.5"/>
+    <line x1="62" y1="34" x2="62" y2="76" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1.5"/>
+    <line x1="75" y1="45" x2="75" y2="76" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="1.5"/>
+
+    <!-- Dynamic Ascending Golden Route -->
+    <path d="M 6 68 C 30 65, 48 54, 76 26 L 96 10" 
+          fill="none" stroke="url(#hdGold)" stroke-width="6.5" stroke-linecap="round"/>
+    
+    <!-- Target Pulse Beacon -->
+    <circle cx="96" cy="10" r="5.5" fill="#F4B400"/>
+    <circle cx="96" cy="10" r="2.5" fill="#FFFFFF"/>
+    
+    <!-- Origin Anchor -->
+    <circle cx="6" cy="68" r="3.5" fill="#F4B400"/>
+  </g>
+
+  <!-- Typography Block -->
+  <g transform="translate(138, 36)">
+    <!-- Main Wordmark -->
+    <text x="0" y="24" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF" letter-spacing="-0.5">
+      GLOBAL<tspan dx="8" fill="#38BDF8" font-weight="600">BRIDGE</tspan>
+    </text>
+    
+    <!-- Golden Accent Point -->
+    <circle cx="238" cy="12" r="4.5" fill="#F4B400"/>
+
+    <!-- Subtitle / Positioning -->
+    <text x="1" y="46" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#94A3B8" letter-spacing="1.2">
+      REMOTE TECH TALENT • EGYPT TO WORLD
+    </text>
+  </g>
+</svg>

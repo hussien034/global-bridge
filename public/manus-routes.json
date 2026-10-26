@@ -1,0 +1,23 @@
+[
+  "/",
+  "/jobs",
+  "/jobs/:id",
+  "/jobs/:id/apply",
+  "/training",
+  "/training/:id",
+  "/companies",
+  "/about",
+  "/login",
+  "/company/dashboard",
+  "/company/jobs",
+  "/company/jobs/new",
+  "/company/jobs/:id/edit",
+  "/company/applicants",
+  "/company/applicants/:id",
+  "/admin",
+  "/admin/companies",
+  "/admin/jobs",
+  "/admin/applicants",
+  "/admin/training",
+  "/admin/activity"
+]

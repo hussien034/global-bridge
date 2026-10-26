@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Bridge — دليل ومعرض الهوية البصرية المصرية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --nile-blue: #085098;
+      --nile-blue-light: #1268A8;
+      --egypt-gold: #D8A038;
+      --egypt-gold-light: #C7A45A;
+      --cairo-ink: #102840;
+      --sand-white: #FBFCFE;
+      --sand-card: #FFFFFF;
+      --border-color: #D0D6DD;
+      --text-muted: #5E6B7B;
+      --bg-main: #F8FAFD;
+      --card-bg: #FFFFFF;
+      --text-main: #102840;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #060D17;
+      --card-bg: #0A1424;
+      --sand-card: #0F1D33;
+      --border-color: #1E2E48;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      font-family: 'Cairo', system-ui, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Top Navigation */
+    header {
+      background: rgba(255, 253, 248, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    [data-theme="dark"] header {
+      background: rgba(10, 20, 36, 0.85);
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 76px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--nile-blue);
+      color: var(--nile-blue);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 60px 0 40px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF7E6;
+      border: 1px solid #FCD34D;
+      color: #B45309;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    .hero h1 span.highlight {
+      background: linear-gradient(135deg, var(--nile-blue), var(--nile-blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h1 span.gold {
+      color: var(--egypt-gold);
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0 auto 30px;
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    /* Section Headers */
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 50px 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 28px;
+      background: var(--egypt-gold);
+      border-radius: 3px;
+    }
+
+    /* Color Palette Grid */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .swatch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      cursor: pointer;
+    }
+    .swatch-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .swatch-color {
+      height: 100px;
+      width: 100%;
+    }
+
+    .swatch-info {
+      padding: 16px;
+    }
+    .swatch-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .swatch-hex {
+      font-family: 'Plus Jakarta Sans', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      direction: ltr;
+      display: inline-block;
+    }
+
+    /* Logo Directions 3 Cards */
+    .directions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+
+    .direction-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .direction-card.recommended {
+      border: 2px solid var(--egypt-gold);
+      position: relative;
+    }
+
+    .recommended-ribbon {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: var(--egypt-gold);
+      color: #10233F;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+
+    .direction-preview {
+      padding: 24px;
+      background: var(--sand-white);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+    }
+    [data-theme="dark"] .direction-preview {
+      background: #0B1626;
+    }
+
+    .direction-preview img, .direction-preview svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .direction-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .direction-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--nile-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .direction-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .direction-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* Master Assets Showcase */
+    .assets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+    @media (max-width: 768px) {
+      .assets-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .asset-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    .asset-box h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .asset-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--border-color);
+      color: var(--text-main);
+      direction: ltr;
+    }
+
+    .asset-render-area {
+      padding: 28px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 130px;
+      border: 1px dashed var(--border-color);
+    }
+
+    .asset-render-area.light-bg {
+      background: #FFFDF8;
+    }
+
+    .asset-render-area.dark-bg {
+      background: #0A1424;
+    }
+
+    /* Compact icons sizes row */
+    .sizes-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .size-item {
+      text-align: center;
+    }
+    .size-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-family: 'Plus Jakarta Sans', monospace;
+    }
+
+    /* Application Demo Bar */
+    .demo-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .demo-bar-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: var(--nile-blue);
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-gold {
+      background: var(--egypt-gold);
+      color: #10233F;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-inner">
+      <div class="brand-title">
+        <img src="logo-compact.svg" alt="Global Bridge Mark" style="height: 42px; width: 42px;">
+        <div>
+          <span>Global Bridge</span>
+          <span style="font-size: 13px; font-weight: 500; color: var(--text-muted); margin-right: 8px;">الهوية البصرية المصرية</span>
+        </div>
+      </div>
+      <button class="theme-toggle-btn" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-text">الوضع الداكن</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badge">🏛️ Egyptian Identity • Global Tech Reach</div>
+      <h1>هوية <span class="highlight">Global Bridge</span> المعاصرة</h1>
+      <p>
+        جسر تقني وحضاري ينطلق من مصر لربط العقول والكوادر البرمجية المصرية بالشركات العالمية في أوروبا وأمريكا، بهوية تنبض بالثقة والاحترافية والعبور نحو الفرص.
+      </p>
+    </section>
+
+    <!-- Color Palette -->
+    <section>
+      <h2 class="section-title">لوحة الألوان الرسمية (Brand Colors)</h2>
+      <div class="palette-grid">
+        <div class="swatch-card" onclick="copyHex('#085098')">
+          <div class="swatch-color" style="background: #085098;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Nile Blue (الأساسي)</div>
+            <div class="swatch-hex">#085098</div>
+          </div>
+        </div>
+        <div class="swatch-card" onclick="copyHex('#D8A038')">
+          <div class="swatch-color" style="background: #D8A038;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Egypt Gold (التمييز)</div>
+            <div class="swatch-hex">#D8A038</div>
+          </div>
+        </div>
+        <div class="swatch-card" onclick="copyHex('#102840')">
+          <div class="swatch-color" style="background: #102840;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Cairo Ink (العناوين والنصوص)</div>
+            <div class="swatch-hex">#102840</div>
+          </div>
+        </div>
+        <div class="swatch-card" onclick="copyHex('#FBFCFE')">
+          <div class="swatch-color" style="background: #FBFCFE; border-bottom: 1px solid #D0D6DD;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Sand White (الخلفيات)</div>
+            <div class="swatch-hex">#FBFCFE</div>
+          </div>
+        </div>
+        <div class="swatch-card" onclick="copyHex('#0A1424')">
+          <div class="swatch-color" style="background: #0A1424;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Deep Navy (الوضع الداكن)</div>
+            <div class="swatch-hex">#0A1424</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The 3 Directions -->
+    <section>
+      <h2 class="section-title">الاتجاهات الثلاثة الأولية للوجو (3 Design Directions)</h2>
+      <div class="directions-grid">
+
+        <!-- Direction 1 -->
+        <div class="direction-card">
+          <div class="direction-preview">
+            <img src="direction-1-arabic.svg" alt="Direction 1: Arabic Mark">
+          </div>
+          <div class="direction-body">
+            <div>
+              <div class="direction-tag">الاتجاه الأول</div>
+              <h3 class="direction-title">Arabic-Forward Mark</h3>
+              <p class="direction-desc">
+                معالجة معمارية كوفية هندسية مبتكرة لكلمة "جسر" مع خط ذهبي صاعد يربط الحروف بالاسم الإنجليزي. أصالة عربية واضحة ومظهر مهيب.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direction 2 (Recommended) -->
+        <div class="direction-card recommended">
+          <div class="recommended-ribbon">⭐ الاتجاه المعتمد</div>
+          <div class="direction-preview">
+            <img src="direction-2-bridge-route.svg" alt="Direction 2: Bridge + Route">
+          </div>
+          <div class="direction-body">
+            <div>
+              <div class="direction-tag" style="color: #D99B00;">الاتجاه الثاني (المعتمد)</div>
+              <h3 class="direction-title">Bridge + Dynamic Route Mark</h3>
+              <p class="direction-desc">
+                قوس هندسي مستوحى من كباري القاهرة الحديثة يعبره مسار ذهبي ينطلق نحو الأفق العالمي. يجمع بين الفهم الفوري والتطبيق العملي الفائق على كل المقاسات.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direction 3 -->
+        <div class="direction-card">
+          <div class="direction-preview">
+            <img src="direction-3-egypt-world.svg" alt="Direction 3: Nexus Portal">
+          </div>
+          <div class="direction-body">
+            <div>
+              <div class="direction-tag">الاتجاه الثالث</div>
+              <h3 class="direction-title">Egypt-to-World Nexus Mark</h3>
+              <p class="direction-desc">
+                بوابة ارتكاز رقمية تنطلق من مركز مصري ذهبي نحو موجات اتصال مدارية حول العالم. طابع تقني مستقبلي معاصر لشبكات التوظيف عن بُعد.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Master Deliverables Suite -->
+    <section>
+      <h2 class="section-title">حزمة المخرجات والتطبيقات العملية (Asset Deliverables)</h2>
+      <div class="assets-grid">
+
+        <!-- Horizontal Light -->
+        <div class="asset-box">
+          <h3>
+            <span>اللوجو الأفقي (الوضع الفاتح)</span>
+            <span class="asset-badge">logo-horizontal-light.svg</span>
+          </h3>
+          <div class="asset-render-area light-bg">
+            <img src="logo-horizontal-light.svg" alt="Horizontal Light Logo" style="max-height: 80px; width: auto;">
+          </div>
+        </div>
+
+        <!-- Horizontal Dark -->
+        <div class="asset-box">
+          <h3>
+            <span>اللوجو الأفقي (الوضع الداكن)</span>
+            <span class="asset-badge">logo-horizontal-dark.svg</span>
+          </h3>
+          <div class="asset-render-area dark-bg">
+            <img src="logo-horizontal-dark.svg" alt="Horizontal Dark Logo" style="max-height: 80px; width: auto;">
+          </div>
+        </div>
+
+        <!-- Bilingual Lockup -->
+        <div class="asset-box">
+          <h3>
+            <span>الشعار الثنائي (عربي / إنجليزي)</span>
+            <span class="asset-badge">logo-lockup-bilingual.svg</span>
+          </h3>
+          <div class="asset-render-area light-bg">
+            <img src="logo-lockup-bilingual.svg" alt="Bilingual Lockup" style="max-height: 80px; width: auto;">
+          </div>
+        </div>
+
+        <!-- Wordmark Alone -->
+        <div class="asset-box">
+          <h3>
+            <span>Wordmark الإنجليزي الصافي</span>
+            <span class="asset-badge">logo-wordmark.svg</span>
+          </h3>
+          <div class="asset-render-area light-bg">
+            <img src="logo-wordmark.svg" alt="Wordmark Alone" style="max-height: 48px; width: auto;">
+          </div>
+        </div>
+
+        <!-- Compact Mark Multi-sizes -->
+        <div class="asset-box" style="grid-column: 1 / -1;">
+          <h3>
+            <span>الرمز المدمج (Favicon, App Icon & Avatar) بمقاسات مختلفة</span>
+            <span class="asset-badge">logo-compact.svg</span>
+          </h3>
+          <div class="asset-render-area" style="background: var(--sand-white);">
+            <div class="sizes-row">
+              <div class="size-item">
+                <img src="logo-compact.svg" style="width: 16px; height: 16px;">
+                <div class="size-label">16px (Favicon)</div>
+              </div>
+              <div class="size-item">
+                <img src="logo-compact.svg" style="width: 32px; height: 32px;">
+                <div class="size-label">32px (Browser Tab)</div>
+              </div>
+              <div class="size-item">
+                <img src="logo-compact.svg" style="width: 64px; height: 64px;">
+                <div class="size-label">64px (Mobile Nav)</div>
+              </div>
+              <div class="size-item">
+                <img src="logo-compact.svg" style="width: 100px; height: 100px;">
+                <div class="size-label">100px (Social Avatar)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Header bar interactive preview -->
+    <section>
+      <h2 class="section-title">معاينة داخل واجهة الموقع (UI Component Preview)</h2>
+      <div class="demo-bar">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <img src="logo-horizontal-light.svg" id="demo-logo" style="height: 44px; width: auto;">
+          <div style="display: flex; gap: 20px; font-weight: 600; font-size: 15px; margin-right: 20px;">
+            <span style="color: var(--nile-blue);">الوظائف المتاحة</span>
+            <span style="color: var(--text-muted);">التدريبات الاختيارية</span>
+            <span style="color: var(--text-muted);">للشركات الدولية</span>
+            <span style="color: var(--text-muted);">من نحن</span>
+          </div>
+        </div>
+        <div class="demo-bar-actions">
+          <button class="btn-primary">استكشف الوظائف</button>
+          <button class="btn-gold">وظّف كفاءات مصرية</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      
+      const icon = document.getElementById('theme-icon');
+      const text = document.getElementById('theme-text');
+      const demoLogo = document.getElementById('demo-logo');
+      
+      if (next === 'dark') {
+        icon.textContent = '☀️';
+        text.textContent = 'الوضع الفاتح';
+        if (demoLogo) demoLogo.src = 'logo-horizontal-dark.svg';
+      } else {
+        icon.textContent = '🌙';
+        text.textContent = 'الوضع الداكن';
+        if (demoLogo) demoLogo.src = 'logo-horizontal-light.svg';
+      }
+    }
+
+    function copyHex(hex) {
+      navigator.clipboard.writeText(hex).then(() => {
+        alert('تم نسخ الكود ' + hex + ' إلى الحافظة!');
+      }).catch(() => {
+        prompt('انسخ كود اللون:', hex);
+      });
+    }
+  </script>
+</body>
+</html>
