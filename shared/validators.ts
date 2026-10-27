@@ -63,10 +63,10 @@ export type CreateAdminAccessRequestInput = z.infer<typeof createAdminAccessRequ
 
 // 3. Job filters query schema
 export const jobFilterSchema = z.object({
-  department: z.string().optional(),
-  experienceLevel: z.string().optional(),
-  search: z.string().optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  department: z.string().trim().max(100).optional(),
+  experienceLevel: z.string().trim().max(50).optional(),
+  search: z.string().trim().max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(12),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
 
@@ -166,9 +166,63 @@ export const registerCandidateSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().trim().email("Enter a valid email address").max(254),
   password: z.string().min(12, "Password must be at least 12 characters").max(128),
+  photoFile: z.object({
+    name: z.string().trim().min(1).max(255),
+    mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+    data: z.string().min(1).max(4 * 1024 * 1024),
+  }),
 });
 
 export type RegisterCandidateInput = z.infer<typeof registerCandidateSchema>;
+
+export const registerCompanySchema = z.object({
+  contactName: z.string().trim().min(2, "Contact name must be at least 2 characters").max(100),
+  email: z.string().trim().email("Enter a valid email address").max(254),
+  password: z.string().min(12, "Password must be at least 12 characters").max(128),
+  companyName: z.string().trim().min(2, "Company name must be at least 2 characters").max(200),
+  website: optionalUrl,
+  country: z.string().trim().min(2, "Country is required").max(120),
+  description: z.string().trim().min(10, "Description must be at least 10 characters").max(2000),
+});
+
+export type RegisterCompanyInput = z.infer<typeof registerCompanySchema>;
+
+export const updateCompanyProfileSchema = z.object({
+  name: z.string().trim().min(2).max(200),
+  website: optionalUrl,
+  country: z.string().trim().min(2).max(120),
+  description: z.string().trim().min(10).max(2000),
+  logoUrl: optionalUrl,
+});
+
+export type UpdateCompanyProfileInput = z.infer<typeof updateCompanyProfileSchema>;
+
+export const createAdminUserSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(254),
+  password: z.string().min(12).max(128),
+});
+
+export type CreateAdminUserInput = z.infer<typeof createAdminUserSchema>;
+
+export const candidateProfileSchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+  phone: z.string().trim().max(40).optional().default(""),
+  headline: z.string().trim().max(120).optional().default(""),
+  location: z.string().trim().max(120).optional().default(""),
+  bio: z.string().trim().max(2000).optional().default(""),
+  skills: z.string().trim().max(1000).optional().default(""),
+  linkedinUrl: optionalUrl,
+  githubUrl: optionalUrl,
+  portfolioUrl: optionalUrl,
+  photoFile: z.object({
+    name: z.string().trim().min(1).max(255),
+    mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+    data: z.string().min(1).max(4 * 1024 * 1024),
+  }).optional(),
+});
+
+export type CandidateProfileInput = z.infer<typeof candidateProfileSchema>;
 
 export const provisionCompanyAccountSchema = z.object({
   name: z.string().trim().min(2).max(200),

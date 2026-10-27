@@ -26,16 +26,27 @@ export const publicRouter = Router();
 publicRouter.get("/jobs", async (req, res) => {
   try {
     const filters = jobFilterSchema.parse(req.query);
-    const jobsList = await jobsService.listActiveJobs({
+    const jobFilters = {
       department: filters.department,
       experienceLevel: filters.experienceLevel,
+      search: filters.search,
       limit: filters.limit,
       offset: filters.offset,
-    });
+    };
+    const [jobsList, total] = await Promise.all([
+      jobsService.listActiveJobs(jobFilters),
+      jobsService.countActiveJobs(jobFilters),
+    ]);
 
     res.status(200).json({
       success: true,
       count: jobsList.length,
+      pagination: {
+        total,
+        limit: filters.limit,
+        offset: filters.offset,
+        hasMore: filters.offset + jobsList.length < total,
+      },
       data: jobsList,
     });
   } catch (error) {

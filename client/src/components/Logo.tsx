@@ -1,4 +1,5 @@
-interface LogoProps {
+
+import { LocalizedContent } from "../i18n";interface LogoProps {
   variant?: "horizontal" | "compact" | "bilingual";
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -13,14 +14,14 @@ export default function Logo({ variant = "horizontal", size = "md", className = 
   const markSize = markSizeMap[size];
 
   if (variant === "bilingual") {
-    return (
+    return <LocalizedContent>{(
       <img
         src="/images/global-bridge-logo.png"
         alt="Global Bridge — جسر المواهب المصرية"
         className={className}
         style={{ display: "block", width: markSize * 1.2, height: markSize * 1.2, objectFit: "contain" }}
       />
-    );
+    )}</LocalizedContent>;
   }
 
   const mark = (
@@ -30,22 +31,15 @@ export default function Logo({ variant = "horizontal", size = "md", className = 
       aria-hidden="true"
       width={markSize}
       height={markSize}
-      style={{
-        display: "block",
-        flexShrink: 0,
-        objectFit: "contain",
-        borderRadius: 8,
-        background: "var(--sand-white)",
-        padding: 2,
-      }}
+      className="brand-mark"
     />
   );
 
   if (variant === "compact") {
-    return <span className={className} style={{ display: "inline-flex" }}>{mark}</span>;
+    return <LocalizedContent>{<span className={className} style={{ display: "inline-flex" }}>{mark}</span>}</LocalizedContent>;
   }
 
-  return (
+  return <LocalizedContent>{(
     <div
       className={`brand-lockup ${className}`}
       style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "1px", textDecoration: "none" }}
@@ -62,7 +56,7 @@ export default function Logo({ variant = "horizontal", size = "md", className = 
           }}
         >
           <span style={{ color: "var(--text-primary)" }}>GLOBAL</span>
-          <span style={{ color: "var(--nile-blue)", fontWeight: 700, marginLeft: "3px" }}>BRIDGE</span>
+          <span style={{ color: "var(--nile-blue-text)", fontWeight: 700, marginLeft: "3px" }}>BRIDGE</span>
           <span
             aria-hidden="true"
             style={{
@@ -81,5 +75,5 @@ export default function Logo({ variant = "horizontal", size = "md", className = 
         </div>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

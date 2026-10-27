@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent } from "../../i18n";
 
 export default function CompanyJobNewPage() {
   const [, setLocation] = useLocation();
@@ -70,7 +71,7 @@ export default function CompanyJobNewPage() {
     }
   };
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
@@ -277,5 +278,5 @@ export default function CompanyJobNewPage() {
         </form>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

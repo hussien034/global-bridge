@@ -1,31 +1,41 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation, LocalizedContent } from "../i18n";
 
-export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+interface ThemeToggleProps {
+  className?: string;
+}
+
+export default function ThemeToggle({ className }: ThemeToggleProps) {
+  const { t } = useTranslation();
+  const [theme, setTheme] = useState<"light" | "dark">(() => (
+    localStorage.getItem("gb-theme") === "light" ? "light" : "dark"
+  ));
 
   useEffect(() => {
-    const saved = localStorage.getItem("gb-theme") as "light" | "dark" | null;
-    if (saved) {
-      setTheme(saved);
-      document.documentElement.setAttribute("data-theme", saved);
-    }
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const toggle = () => {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
     localStorage.setItem("gb-theme", next);
-    document.documentElement.setAttribute("data-theme", next);
   };
 
-  return (
+  return <LocalizedContent>{(
     <button
+      type="button"
       onClick={toggle}
-      className="btn btn-outline"
-      style={{ padding: "8px 14px", fontSize: "13px", borderRadius: "999px" }}
-      title={theme === "light" ? "التبديل إلى الوضع الداكن" : "التبديل إلى الوضع الفاتح"}
+      className={`theme-toggle${className ? ` ${className}` : ""}`}
+      role="switch"
+      aria-checked={theme === "dark"}
+      aria-label={t(theme === "light" ? "common.switchToDarkMode" : "common.switchToLightMode")}
+      title={t(theme === "light" ? "common.switchToDarkMode" : "common.switchToLightMode")}
     >
-      {theme === "light" ? "🌙 الداكن" : "☀️ الفاتح"}
+      <span className="theme-toggle-track" aria-hidden="true">
+        <span className="theme-toggle-icon theme-toggle-sun">☀</span>
+        <span className="theme-toggle-icon theme-toggle-moon">☾</span>
+        <span className="theme-toggle-thumb" />
+      </span>
     </button>
-  );
+  )}</LocalizedContent>;
 }

@@ -19,6 +19,7 @@ import TrainingDetailPage from "./pages/public/TrainingDetailPage";
 import CompaniesPage from "./pages/public/CompaniesPage";
 import AboutPage from "./pages/public/AboutPage";
 import LoginPage from "./pages/public/LoginPage";
+import CandidateProfilePage from "./pages/public/CandidateProfilePage";
 
 // Company Pages
 import CompanyDashboardPage from "./pages/company/CompanyDashboardPage";
@@ -27,6 +28,7 @@ import CompanyJobNewPage from "./pages/company/CompanyJobNewPage";
 import CompanyJobEditPage from "./pages/company/CompanyJobEditPage";
 import CompanyApplicantsPage from "./pages/company/CompanyApplicantsPage";
 import CompanyApplicantDetailPage from "./pages/company/CompanyApplicantDetailPage";
+import CompanyProfilePage from "./pages/company/CompanyProfilePage";
 
 // Admin Pages
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -98,7 +100,23 @@ export default function App() {
         </PublicLayout>
       </Route>
 
+      <Route path="/candidate/profile">
+        <ProtectedRoute roles={["candidate"]}>
+          <PublicLayout>
+            <CandidateProfilePage />
+          </PublicLayout>
+        </ProtectedRoute>
+      </Route>
+
       {/* 2. Company Private Routes — requires company or admin role */}
+      <Route path="/company/profile">
+        <ProtectedRoute roles={["company", "admin"]}>
+          <CompanyLayout>
+            <CompanyProfilePage />
+          </CompanyLayout>
+        </ProtectedRoute>
+      </Route>
+
       <Route path="/company/dashboard">
         <ProtectedRoute roles={["company", "admin"]}>
           <CompanyLayout>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function AdminActivityPage() {
+  const { language } = useTranslation();
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function AdminActivityPage() {
     loadEvents();
   }, []);
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -102,7 +104,7 @@ export default function AdminActivityPage() {
                     )}
                   </div>
                   <div style={{ fontSize: "12px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
-                    {act.createdAt ? new Date(act.createdAt).toLocaleString("ar-EG") : "الآن"}
+                    {act.createdAt ? new Date(act.createdAt).toLocaleString(language === "ar" ? "ar-EG" : "en-GB") : "الآن"}
                   </div>
                 </div>
               ))}
@@ -111,5 +113,5 @@ export default function AdminActivityPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

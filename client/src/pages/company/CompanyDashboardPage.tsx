@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 interface DashboardStats {
   totalJobs: number;
@@ -15,11 +16,13 @@ interface DashboardStats {
 
 export default function CompanyDashboardPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
   const [recentApplicants, setRecentApplicants] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -28,10 +31,11 @@ export default function CompanyDashboardPage() {
         setIsLoading(true);
         setError(null);
 
-        const [statsRes, jobsRes, appsRes] = await Promise.all([
+        const [statsRes, jobsRes, appsRes, profileRes] = await Promise.all([
           api.company.getDashboard().catch(() => ({ success: false, data: null })),
           api.company.getJobs().catch(() => ({ success: false, data: [] })),
           api.company.getApplicants().catch(() => ({ success: false, data: [] })),
+          api.company.getProfile(),
         ]);
 
         if (isMounted) {
@@ -44,6 +48,7 @@ export default function CompanyDashboardPage() {
           if (appsRes && appsRes.data) {
             setRecentApplicants(appsRes.data.slice(0, 4));
           }
+          setNeedsVerification(Boolean(profileRes.data && profileRes.data.verificationStatus !== "verified"));
         }
       } catch (err: any) {
         if (isMounted) {
@@ -91,7 +96,7 @@ export default function CompanyDashboardPage() {
     },
   ];
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       {/* Top Header Card */}
       <div className="feature-card" style={{ marginBottom: "24px", position: "relative", overflow: "hidden" }}>
@@ -121,6 +126,16 @@ export default function CompanyDashboardPage() {
           </div>
         </div>
       </div>
+
+      {needsVerification && (
+        <div className="auth-review-note" role="status" style={{ marginBottom: 24 }}>
+          <strong>{t("companyProfile.verificationTitle")}</strong>
+          <span>
+            {t("companyProfile.verificationDescription")}{" "}
+            <Link href="/company/profile">{t("companyProfile.completeProfile")}</Link>
+          </span>
+        </div>
+      )}
 
       {error && (
         <div style={{ padding: "16px", borderRadius: "8px", background: "rgba(239, 68, 68, 0.1)", color: "#EF4444", marginBottom: "24px" }}>
@@ -239,5 +254,5 @@ export default function CompanyDashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

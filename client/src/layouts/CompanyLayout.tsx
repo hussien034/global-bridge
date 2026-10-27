@@ -3,6 +3,8 @@ import { Link, useLocation } from "wouter";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuth } from "../context/AuthContext";
+import { LocalizedContent } from "../i18n";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 interface CompanyLayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  useScrollReveal(".dashboard-content-inner", location);
 
   const handleLogout = async () => {
     await logout();
@@ -20,12 +23,13 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
 
   const menuItems = [
     { label: "لوحة التحكم الرئيسية", href: "/company/dashboard", icon: "📊" },
+    { label: "ملف الشركة", href: "/company/profile", icon: "🏢" },
     { label: "الوظائف المعلنة", href: "/company/jobs", icon: "💼" },
     { label: "نشر وظيفة جديدة", href: "/company/jobs/new", icon: "➕" },
     { label: "إدارة المتقدمين (ATS)", href: "/company/applicants", icon: "👥" },
   ];
 
-  return (
+  return <LocalizedContent>{(
     <div className="dashboard-shell">
       {user?.isDemo && (
         <div className="dashboard-demo-banner">
@@ -112,5 +116,5 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
         </div>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

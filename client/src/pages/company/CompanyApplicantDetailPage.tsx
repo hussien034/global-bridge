@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function CompanyApplicantDetailPage() {
+  const { language, t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [applicant, setApplicant] = useState<any | null>(null);
   const [notes, setNotes] = useState<any[]>([]);
@@ -61,7 +63,7 @@ export default function CompanyApplicantDetailPage() {
         setTimeout(() => setStatusSuccess(null), 3000);
       }
     } catch (err: any) {
-      alert(err.message || "فشل تحديث المرحلة.");
+      alert(t(err.message || "فشل تحديث المرحلة."));
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -78,32 +80,32 @@ export default function CompanyApplicantDetailPage() {
         loadData();
       }
     } catch (err: any) {
-      alert(err.message || "فشل إضافة الملاحظة.");
+      alert(t(err.message || "فشل إضافة الملاحظة."));
     } finally {
       setIsAddingNote(false);
     }
   }
 
   if (isLoading) {
-    return (
+    return <LocalizedContent>{(
       <div className="container" style={{ padding: "40px 24px", textAlign: "center", color: "var(--text-muted)" }}>
         جاري تحميل ملف المرشح #{id}...
       </div>
-    );
+    )}</LocalizedContent>;
   }
 
   if (!applicant) {
-    return (
+    return <LocalizedContent>{(
       <div className="container" style={{ padding: "40px 24px", textAlign: "center" }}>
         <p style={{ color: "#EF4444", fontSize: "16px" }}>⚠️ لم يتم العثور على هذا المرشح أو انتهت صلاحية العرض.</p>
         <Link href="/company/applicants" className="btn btn-outline" style={{ marginTop: "16px" }}>
           العودة لقائمة المتقدمين
         </Link>
       </div>
-    );
+    )}</LocalizedContent>;
   }
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       {/* Header Bar */}
       <div className="feature-card" style={{ marginBottom: "24px" }}>
@@ -129,7 +131,7 @@ export default function CompanyApplicantDetailPage() {
               </span>
             </div>
             <p style={{ color: "var(--text-muted)", margin: "4px 0 0", fontSize: "14px" }}>
-              متقدم لوظيفة: <strong>{applicant.job?.title || `الوظيفة #${applicant.jobId}`}</strong> • تاريخ التقديم: {applicant.createdAt ? new Date(applicant.createdAt).toLocaleDateString("ar-EG") : "—"}
+              متقدم لوظيفة: <strong>{applicant.job?.title || `الوظيفة #${applicant.jobId}`}</strong> • تاريخ التقديم: {applicant.createdAt ? new Date(applicant.createdAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-GB") : "—"}
             </p>
           </div>
 
@@ -237,7 +239,7 @@ export default function CompanyApplicantDetailPage() {
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px", fontSize: "13px" }}>
                       <strong style={{ color: "var(--cairo-ink)" }}>{n.author?.name || `المقيّم #${n.userId || ""}`}:</strong>
                       <span style={{ color: "var(--text-muted)" }}>
-                        {n.createdAt ? new Date(n.createdAt).toLocaleString("ar-EG") : ""}
+                        {n.createdAt ? new Date(n.createdAt).toLocaleString(language === "ar" ? "ar-EG" : "en-GB") : ""}
                       </span>
                     </div>
                     <p style={{ fontSize: "14px", margin: 0, lineHeight: 1.6, whiteSpace: "pre-line" }}>
@@ -333,5 +335,5 @@ export default function CompanyApplicantDetailPage() {
         </aside>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

@@ -9,7 +9,8 @@ import {
   applicationEvents,
   partnershipLeads,
 } from "@shared/schema";
-import { sql } from "drizzle-orm";
+import { hashPassword } from "../auth/password";
+import { seedDemoJobs } from "./demo-jobs";
 
 export async function runSeed() {
   console.log("🌱 [Global Bridge] Starting database seeding with realistic Demo data...");
@@ -79,6 +80,7 @@ export async function runSeed() {
     .values({
       name: "مدير المنصة (Super Admin)",
       email: "admin@globalbridge.demo",
+      passwordHash: await hashPassword("admin@globalbridge.demo"),
       role: "admin",
       companyId: null,
     })
@@ -89,6 +91,7 @@ export async function runSeed() {
     .values({
       name: "Sarah King (Northstar Lead)",
       email: "hiring@northstar.demo",
+      passwordHash: await hashPassword("northstar-demo"),
       role: "company",
       companyId: northstar.id,
     })
@@ -99,6 +102,7 @@ export async function runSeed() {
     .values({
       name: "David Miller (Cedarline Recruiter)",
       email: "recruiter@cedarline.demo",
+      passwordHash: await hashPassword("cedarline-demo"),
       role: "company",
       companyId: cedarline.id,
     })
@@ -109,6 +113,7 @@ export async function runSeed() {
     .values({
       name: "Lukas Weber (Atlas Tech Lead)",
       email: "hiring@atlas.demo",
+      passwordHash: await hashPassword("atlas-demo"),
       role: "company",
       companyId: atlas.id,
     })
@@ -119,6 +124,7 @@ export async function runSeed() {
   await db.insert(users).values({
     name: "Demo Company (Northstar Labs)",
     email: "demo-company@globalbridge.dev",
+    passwordHash: await hashPassword("demo-company"),
     role: "company",
     companyId: northstar.id,
   });
@@ -126,6 +132,7 @@ export async function runSeed() {
   await db.insert(users).values({
     name: "Demo Admin (Global Bridge)",
     email: "demo-admin@globalbridge.dev",
+    passwordHash: await hashPassword("demo-admin"),
     role: "admin",
     companyId: null,
   });
@@ -133,6 +140,7 @@ export async function runSeed() {
   await db.insert(users).values({
     name: "Demo Candidate (مرشح تقني)",
     email: "demo-candidate@globalbridge.dev",
+    passwordHash: await hashPassword("demo-candidate"),
     role: "candidate",
     companyId: null,
   });
@@ -260,6 +268,8 @@ export async function runSeed() {
       publishedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
     })
     .returning();
+
+  await seedDemoJobs();
 
   // 5. Insert Trainings (2 Programs Required, Clearly Marked Optional)
   console.log("🎓 Seeding 2 Optional Demo Training Programs...");
@@ -584,7 +594,7 @@ export async function runSeed() {
     },
   ]);
 
-  console.log("✨ [Global Bridge] Database successfully seeded with 3 companies, 5 jobs, 2 trainings, 7 applicants, and full audit logs!");
+  console.log("✨ [Global Bridge] Database successfully seeded with 5 demo companies, 100 jobs, 2 trainings, 7 applicants, and full audit logs!");
 }
 
 // Execute seed

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function CompanyJobsPage() {
+  const { t } = useTranslation();
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +37,12 @@ export default function CompanyJobsPage() {
       loadJobs();
       setTimeout(() => setActionSuccess(null), 3000);
     } catch (err: any) {
-      alert(err.message || "فشل تغيير حالة الوظيفة.");
+      alert(t(err.message || "فشل تغيير حالة الوظيفة."));
     }
   }
 
   async function handleCloseJob(jobId: number, title: string) {
-    if (!window.confirm(`هل تريد إغلاق الوظيفة "${title}"؟`)) {
+    if (!window.confirm(t("هل تريد إغلاق الوظيفة \"{{title}}\"؟", { title }))) {
       return;
     }
     try {
@@ -49,11 +51,11 @@ export default function CompanyJobsPage() {
       loadJobs();
       setTimeout(() => setActionSuccess(null), 3000);
     } catch (err: any) {
-      alert(err.message || "فشل إغلاق الوظيفة.");
+      alert(t(err.message || "فشل إغلاق الوظيفة."));
     }
   }
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -178,5 +180,5 @@ export default function CompanyJobsPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

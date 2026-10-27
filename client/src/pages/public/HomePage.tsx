@@ -4,21 +4,47 @@ import JobCard from "../../components/JobCard";
 import { api } from "../../services/api";
 import { useTranslation } from "../../i18n";
 
+interface FeaturedJob {
+  id: number;
+  slug?: string;
+  title: string;
+  department?: string;
+  employmentType?: string;
+  remotePolicy?: string;
+  experienceLevel?: string;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  salaryCurrency?: string | null;
+  timezoneOverlap?: string | null;
+  company?: {
+    name?: string;
+    country?: string;
+    isDemo?: boolean;
+    logoUrl?: string | null;
+  };
+}
+
 export default function HomePage() {
   const { t } = useTranslation();
-  const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+  const [featuredJobs, setFeaturedJobs] = useState<FeaturedJob[]>([]);
 
   useEffect(() => {
     async function loadHomeData() {
       try {
-        const jobsRes = await api.public.getJobs({ limit: 3 }).catch(() => ({ success: false, data: [] }));
-        if (jobsRes && jobsRes.data) setFeaturedJobs(jobsRes.data);
+        const jobsRes = await api.public.getJobs({ limit: 3 });
+        if (jobsRes.success && jobsRes.data) setFeaturedJobs(jobsRes.data);
       } catch {
-        // non-blocking
+        setFeaturedJobs([]);
       }
     }
+
     loadHomeData();
   }, []);
+
+  const trustPoints = ["trust1", "trust2", "trust3", "trust4"];
+  const candidatePoints = ["candidatePoint1", "candidatePoint2", "candidatePoint3"];
+  const companyPoints = ["companyPoint1", "companyPoint2", "companyPoint3"];
+  const benefits = ["benefit1", "benefit2", "benefit3", "benefit4"];
 
   return (
     <div className="home-page home-heritage">
@@ -35,9 +61,7 @@ export default function HomePage() {
               {t("home.title")}
               <span className="heritage-title-accent">{t("home.titleAccent")}</span>
             </h1>
-            <p className="heritage-intro">
-              {t("home.intro")}
-            </p>
+            <p className="heritage-intro">{t("home.intro")}</p>
 
             <div className="btn-group heritage-actions">
               <Link href="/jobs" className="btn heritage-btn heritage-btn-primary">
@@ -48,89 +72,111 @@ export default function HomePage() {
                 {t("home.hireTalent")}
               </Link>
             </div>
-
-            <ul className="heritage-trust-list" aria-label={t("home.trustLabel")}>
-              <li>{t("home.trust1")}</li>
-              <li>{t("home.trust2")}</li>
-              <li>{t("home.trust3")}</li>
-            </ul>
           </div>
 
           <div className="heritage-visual">
             <img
               className="heritage-visual-image"
-              src="/images/giza-pyramids.jpg"
+              src="/images/tech-team-hero.jpg"
               alt={t("home.imageAlt")}
             />
-            <div className="heritage-arch-mark" aria-hidden="true" />
-            <div className="heritage-visual-status">
-              <span className="heritage-status-dot" aria-hidden="true" />
-              <span>{t("home.ready")}</span>
-            </div>
-            <div className="heritage-visual-talent">
-              <span className="heritage-talent-mark">EG</span>
-              <span>{t("home.talent")}</span>
-            </div>
-            <div className="heritage-visual-caption">
-              <span className="heritage-coordinates">29.9792° N, 31.1342° E</span>
-              <strong>{t("home.location")}</strong>
-              <span>{t("home.caption")}</span>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Jobs Section */}
+      <section className="container home-trust-strip" aria-label={t("home.trustLabel")}>
+        {trustPoints.map((point) => (
+          <div className="home-trust-item" key={point}>
+            <span className="home-trust-marker" aria-hidden="true">✓</span>
+            <span>{t(`home.${point}`)}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="container home-audiences" aria-labelledby="home-audience-title">
+        <div className="home-section-heading">
+          <span className="home-section-eyebrow">{t("home.audienceEyebrow")}</span>
+          <h2 id="home-audience-title">{t("home.audienceTitle")}</h2>
+        </div>
+        <div className="home-audience-grid">
+          <article className="home-audience-card home-audience-candidates">
+            <span className="home-audience-kicker">{t("home.candidateKicker")}</span>
+            <h3>{t("home.candidateTitle")}</h3>
+            <ul>
+              {candidatePoints.map((point) => <li key={point}>{t(`home.${point}`)}</li>)}
+            </ul>
+            <Link href="/jobs" className="btn btn-primary">{t("home.candidateCta")}</Link>
+          </article>
+          <article className="home-audience-card home-audience-companies">
+            <span className="home-audience-kicker">{t("home.companyKicker")}</span>
+            <h3>{t("home.companyTitle")}</h3>
+            <ul>
+              {companyPoints.map((point) => <li key={point}>{t(`home.${point}`)}</li>)}
+            </ul>
+            <Link href="/companies" className="btn btn-outline">{t("home.companyCta")}</Link>
+          </article>
+        </div>
+      </section>
+
       {featuredJobs.length > 0 && (
-        <section className="container featured-jobs-section">
+        <section className="container featured-jobs-section home-featured-jobs">
           <div className="featured-jobs-heading">
             <div>
-              <h2>
-                {t("home.featuredTitle")}
-              </h2>
-              <p>
-                {t("home.featuredDescription")}
-              </p>
+              <span className="home-section-eyebrow">{t("home.jobsEyebrow")}</span>
+              <h2>{t("home.featuredTitle")}</h2>
+              <p>{t("home.featuredDescription")}</p>
             </div>
-            <Link href="/jobs" className="table-action-link">
-              {t("home.allJobs")} ←
-            </Link>
+            <Link href="/jobs" className="table-action-link">{t("home.allJobs")} <span aria-hidden="true">←</span></Link>
           </div>
-
           <div className="jobs-list-container position-cards-grid">
-            {featuredJobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
+            {featuredJobs.map((job) => <JobCard key={job.id} job={job} />)}
           </div>
         </section>
       )}
 
-      {/* How it Works Section */}
-      <section className="container" style={{ margin: "40px auto 60px" }}>
-        <h2 className="section-heading-centered">{t("home.howTitle")}</h2>
-        <p className="section-sub-centered">{t("home.howIntro")}</p>
-
-        <div className="cards-grid">
-          <div className="feature-card">
-            <div className="card-step-badge">1</div>
-            <h3>{t("home.step1Title")}</h3>
-            <p>{t("home.step1Description")}</p>
-          </div>
-
-          <div className="feature-card">
-            <div className="card-step-badge" style={{ background: "var(--egypt-gold)", color: "#102840" }}>2</div>
-            <h3>{t("home.step2Title")}</h3>
-            <p>{t("home.step2Description")}</p>
-          </div>
-
-          <div className="feature-card">
-            <div className="card-step-badge">3</div>
-            <h3>{t("home.step3Title")}</h3>
-            <p>{t("home.step3Description")}</p>
-          </div>
+      <section className="container home-how-section" aria-labelledby="home-how-title">
+        <div className="home-section-heading">
+          <span className="home-section-eyebrow">{t("home.howEyebrow")}</span>
+          <h2 id="home-how-title">{t("home.howTitle")}</h2>
+          <p>{t("home.howIntro")}</p>
         </div>
+        <ol className="home-steps">
+          {[1, 2, 3].map((step) => (
+            <li className="home-step" key={step}>
+              <span className="home-step-number">{step}</span>
+              <h3>{t(`home.step${step}Title`)}</h3>
+              <p>{t(`home.step${step}Description`)}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
+      <section className="container home-benefits-section" aria-labelledby="home-benefits-title">
+        <div className="home-section-heading">
+          <span className="home-section-eyebrow">{t("home.benefitsEyebrow")}</span>
+          <h2 id="home-benefits-title">{t("home.benefitsTitle")}</h2>
+        </div>
+        <ul className="home-benefits-grid">
+          {benefits.map((benefit, index) => (
+            <li className="home-benefit-card" key={benefit}>
+              <span className="home-benefit-icon" aria-hidden="true">{["✓", "▦", "عA", "i"][index]}</span>
+              <span>{t(`home.${benefit}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="container home-final-cta">
+        <div>
+          <span>{t("home.finalEyebrow")}</span>
+          <h2>{t("home.finalTitle")}</h2>
+          <p>{t("home.finalDescription")}</p>
+        </div>
+        <div className="home-final-actions">
+          <Link href="/jobs" className="btn home-final-primary">{t("home.browseJobs")}</Link>
+          <Link href="/companies" className="btn home-final-secondary">{t("home.hireTalent")}</Link>
+        </div>
+      </section>
     </div>
   );
 }

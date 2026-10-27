@@ -11,6 +11,39 @@ export interface ApiResponse<T = any> {
   leadId?: number;
   count?: number;
   errors?: any[];
+  pagination?: {
+    total: number;
+    limit: number;
+    offset: number;
+    hasMore: boolean;
+  };
+}
+
+export interface CandidateProfile {
+  name: string;
+  email: string;
+  phone: string;
+  headline: string;
+  location: string;
+  bio: string;
+  skills: string;
+  linkedinUrl: string;
+  githubUrl: string;
+  portfolioUrl: string;
+  profileComplete: boolean;
+  photoUrl: string | null;
+}
+
+export interface CompanyProfile {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  website: string;
+  country: string;
+  logoUrl: string | null;
+  verificationStatus: "verified" | "pending" | "unverified";
+  status: "active" | "suspended";
 }
 
 function getAuthHeaders(): HeadersInit {
@@ -44,13 +77,39 @@ async function request<T = any>(endpoint: string, options: RequestInit = {}): Pr
           return field ? `${field}: ${item.message}` : item.message;
         }).filter(Boolean)
       : [];
-    throw new Error(validationMessages.join("، ") || data.error || `HTTP ${res.status}`);
+    const separator = localStorage.getItem("gb_language") === "en" ? ", " : "، ";
+    throw new Error(validationMessages.join(separator) || data.error || `HTTP ${res.status}`);
   }
 
   return data;
 }
 
 export const api = {
+  auth: {
+    async getProfile() {
+      return request<CandidateProfile>("/api/auth/profile");
+    },
+
+    async updateProfile(body: {
+      name: string;
+      phone: string;
+      headline: string;
+      location: string;
+      bio: string;
+      skills: string;
+      linkedinUrl: string;
+      githubUrl: string;
+      portfolioUrl: string;
+      photoFile?: { name: string; mimeType: string; data: string };
+    }) {
+      return request("/api/auth/profile", {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+    },
+
+  },
+
   // ==========================================
   // Public Endpoints
   // ==========================================
@@ -59,11 +118,19 @@ export const api = {
       return request<any>(`/api/public/stats`);
     },
 
-    async getJobs(params?: { department?: string; experienceLevel?: string; limit?: number }) {
+    async getJobs(params?: {
+      department?: string;
+      experienceLevel?: string;
+      search?: string;
+      limit?: number;
+      offset?: number;
+    }) {
       const q = new URLSearchParams();
       if (params?.department) q.set("department", params.department);
       if (params?.experienceLevel) q.set("experienceLevel", params.experienceLevel);
+      if (params?.search) q.set("search", params.search);
       if (params?.limit) q.set("limit", params.limit.toString());
+      if (params?.offset !== undefined) q.set("offset", params.offset.toString());
       return request<any[]>(`/api/public/jobs?${q.toString()}`);
     },
 
@@ -136,6 +203,23 @@ export const api = {
   // Company Dashboard Endpoints
   // ==========================================
   company: {
+    async getProfile() {
+      return request<CompanyProfile>("/api/company/profile");
+    },
+
+    async updateProfile(body: {
+      name: string;
+      website: string;
+      country: string;
+      description: string;
+      logoUrl: string;
+    }) {
+      return request<CompanyProfile>("/api/company/profile", {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+    },
+
     async getDashboard() {
       return request<any>(`/api/company/dashboard`);
     },
@@ -196,6 +280,13 @@ export const api = {
   // Admin Endpoints
   // ==========================================
   admin: {
+    async createAdminUser(body: { name: string; email: string; password: string }) {
+      return request("/api/admin/users/admins", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+    },
+
     async getDashboard() {
       return request<any>(`/api/admin/dashboard`);
     },

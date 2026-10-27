@@ -10,6 +10,7 @@ import {
 } from "../middleware/auth.middleware";
 import {
   createJobSchema,
+  updateCompanyProfileSchema,
   updateJobSchema,
   changeJobStatusSchema,
   changeApplicantStatusSchema,
@@ -18,11 +19,62 @@ import {
 } from "@shared/validators";
 import { ZodError } from "zod";
 import { readCandidateCv } from "../services/cv-storage";
+import { db } from "../db";
+import { companies } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 export const companyRouter = Router();
 
 // All company routes require authenticated company or admin role
 companyRouter.use(requireRole("company", "admin"));
+
+companyRouter.get("/profile", async (req, res) => {
+  try {
+    const companyId = req.sessionUser!.companyId;
+    if (!companyId) {
+      return res.status(403).json({ success: false, error: "No company associated with this account." });
+    }
+
+    const [company] = await db.select().from(companies).where(eq(companies.id, companyId)).limit(1);
+    if (!company) return res.status(404).json({ success: false, error: "Company profile not found." });
+    res.status(200).json({ success: true, data: company });
+  } catch (error) {
+    console.error("[Company API] Profile fetch error:", error);
+    res.status(500).json({ success: false, error: "Unable to load the company profile right now." });
+  }
+});
+
+companyRouter.put("/profile", async (req, res) => {
+  try {
+    const companyId = req.sessionUser!.companyId;
+    if (!companyId) {
+      return res.status(403).json({ success: false, error: "No company associated with this account." });
+    }
+
+    const input = updateCompanyProfileSchema.parse(req.body);
+    const [updatedCompany] = await db.update(companies).set({
+      name: input.name,
+      website: input.website || "",
+      country: input.country,
+      description: input.description,
+      logoUrl: input.logoUrl || null,
+      updatedAt: new Date().toISOString(),
+    }).where(eq(companies.id, companyId)).returning();
+
+    if (!updatedCompany) return res.status(404).json({ success: false, error: "Company profile not found." });
+    req.sessionUser!.companyName = updatedCompany.name;
+    res.status(200).json({ success: true, data: updatedCompany });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: error.errors[0]?.message || "Invalid company profile details.",
+      });
+    }
+    console.error("[Company API] Profile update error:", error);
+    res.status(500).json({ success: false, error: "Unable to update the company profile right now." });
+  }
+});
 
 // ==========================================
 // 1. Company Dashboard
@@ -98,6 +150,19 @@ companyRouter.post("/jobs", async (req, res) => {
     }
 
     const input = createJobSchema.parse(req.body);
+    const [company] = await db.select({ verificationStatus: companies.verificationStatus })
+      .from(companies)
+      .where(eq(companies.id, companyId))
+      .limit(1);
+    if (!company) {
+      return res.status(404).json({ success: false, error: "Company profile not found." });
+    }
+    if (company.verificationStatus !== "verified" && input.status === "active") {
+      return res.status(403).json({
+        success: false,
+        error: "Your company profile must be verified before publishing jobs. You can save the job as a draft.",
+      });
+    }
 
     // Generate slug from title
     const slug = input.title
@@ -150,6 +215,18 @@ companyRouter.patch("/jobs/:id", async (req, res) => {
     }
 
     const input = updateJobSchema.parse(req.body);
+    if (input.status === "active" && req.sessionUser!.role === "company") {
+      const [company] = await db.select({ verificationStatus: companies.verificationStatus })
+        .from(companies)
+        .where(eq(companies.id, existing.companyId))
+        .limit(1);
+      if (company?.verificationStatus !== "verified") {
+        return res.status(403).json({
+          success: false,
+          error: "Your company profile must be verified before publishing jobs.",
+        });
+      }
+    }
     const updated = await jobsService.updateJob(jobId, input);
 
     console.log(`[Company API] Job #${jobId} updated by user #${req.sessionUser!.id}.`);
@@ -184,6 +261,18 @@ companyRouter.patch("/jobs/:id/status", async (req, res) => {
     }
 
     const { status } = changeJobStatusSchema.parse(req.body);
+    if (status === "active" && req.sessionUser!.role === "company") {
+      const [company] = await db.select({ verificationStatus: companies.verificationStatus })
+        .from(companies)
+        .where(eq(companies.id, existing.companyId))
+        .limit(1);
+      if (company?.verificationStatus !== "verified") {
+        return res.status(403).json({
+          success: false,
+          error: "Your company profile must be verified before publishing jobs.",
+        });
+      }
+    }
 
     // Set publishedAt when activating
     const updateData: Record<string, unknown> = { status };

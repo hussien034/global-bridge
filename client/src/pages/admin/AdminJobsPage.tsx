@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent } from "../../i18n";
 
 export default function AdminJobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
@@ -29,7 +30,7 @@ export default function AdminJobsPage() {
     loadJobs(selectedStatus);
   }, [selectedStatus]);
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -131,5 +132,5 @@ export default function AdminJobsPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

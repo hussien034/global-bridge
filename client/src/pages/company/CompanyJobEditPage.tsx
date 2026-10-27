@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent } from "../../i18n";
 
 export default function CompanyJobEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,14 +114,14 @@ export default function CompanyJobEditPage() {
   };
 
   if (isLoading) {
-    return (
+    return <LocalizedContent>{(
       <div className="container" style={{ padding: "40px 24px", textAlign: "center", color: "var(--text-muted)" }}>
         جاري تحميل بيانات الوظيفة #{id}...
       </div>
-    );
+    )}</LocalizedContent>;
   }
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
@@ -306,5 +307,5 @@ export default function CompanyJobEditPage() {
         </form>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

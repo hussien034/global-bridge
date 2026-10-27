@@ -29,22 +29,94 @@ interface JobCardProps {
 function getArtwork(title: string, department = "") {
   const specialty = `${title} ${department}`.toLowerCase();
 
+  if (/product design|designer|ux|ui design|visual design/.test(specialty)) {
+    return {
+      image: "design",
+      src: "/images/job-artwork/05-uiux/uiux-design-tools.svg",
+      label: "specialtyDesign",
+    };
+  }
+  if (/mobile|ios|android|react native/.test(specialty)) {
+    return {
+      image: "mobile",
+      src: "/images/job-artwork/04-mobile/mobile-apps.svg",
+      label: "specialtyMobile",
+    };
+  }
+  if (/security|cyber/.test(specialty)) {
+    return {
+      image: "security",
+      src: "/images/job-artwork/09-cybersecurity/cybersecurity.svg",
+      label: "specialtySecurity",
+    };
+  }
+  if (/customer success/.test(specialty)) {
+    return {
+      image: "support",
+      src: "/images/job-artwork/12-customer-success/customer-success.svg",
+      label: "specialtySupport",
+    };
+  }
+  if (/technical support|it support|help desk/.test(specialty)) {
+    return { image: "support", label: "specialtySupport" };
+  }
+  if (/sales|marketing|growth marketing/.test(specialty)) {
+    return {
+      image: "business",
+      src: "/images/job-artwork/11-sales-marketing/sales-marketing.svg",
+      label: "specialtySalesMarketing",
+    };
+  }
+  if (/business analysis|project management|product management|product manager|program manager|technical writ/.test(specialty)) {
+    return {
+      image: "business",
+      src: "/images/job-artwork/10-product-project/product-project-management.svg",
+      label: "specialtyBusiness",
+    };
+  }
+  if (/full[\s-]?stack/.test(specialty)) {
+    return {
+      image: "software",
+      src: "/images/job-artwork/03-fullstack/fullstack-production.svg",
+      label: "specialtySoftware",
+    };
+  }
   if (/backend|back-end|api|database/.test(specialty)) {
-    return { image: "backend", label: "specialtyBackend" };
+    return {
+      image: "backend",
+      src: "/images/job-artwork/02-backend/backend-code-sample.svg",
+      label: "specialtyBackend",
+    };
   }
   if (/devops|sre|cloud|platform|infrastructure/.test(specialty)) {
-    return { image: "devops", label: "specialtyCloud" };
+    return {
+      image: "devops",
+      src: "/images/job-artwork/07-devops/devops-server.svg",
+      label: "specialtyCloud",
+    };
   }
-  if (/frontend|front-end|ui|ux|web design/.test(specialty)) {
-    return { image: "frontend", label: "specialtyFrontend" };
+  if (/frontend|front-end|web application|web design/.test(specialty)) {
+    return {
+      image: "frontend",
+      src: "/images/job-artwork/01-frontend/frontend-programming.svg",
+      label: "specialtyFrontend",
+    };
   }
   if (/quality|qa|test automation|testing/.test(specialty)) {
-    return { image: "qa", label: "specialtyQuality" };
+    return {
+      image: "qa",
+      src: "/images/job-artwork/06-qa/qa-usability-testing.svg",
+      label: "specialtyQuality",
+    };
   }
   if (/data|analytics|machine learning|\bml\b|artificial intelligence|\bai\b/.test(specialty)) {
-    return { image: "data", label: "specialtyData" };
+    return {
+      image: "data",
+      src: "/images/job-artwork/08-data/data-analysis.svg",
+      label: "specialtyData",
+    };
   }
-  return { image: "software", label: "specialtySoftware" };
+  return { image: "software", src: "/images/roles/software.svg", label: "specialtySoftware" };
 }
 
 export default function JobCard({ job }: JobCardProps) {
@@ -65,7 +137,7 @@ export default function JobCard({ job }: JobCardProps) {
   return (
     <article className="position-card">
       <div className={`position-card-artwork position-card-artwork-${artwork.image}`}>
-        <img src={`/images/roles/${artwork.image}.svg`} alt="" loading="lazy" />
+        <img src={artwork.src} alt="" loading="lazy" />
         <span className="position-card-specialty">{t(`jobs.${artwork.label}`)}</span>
         {job.company?.isDemo && <span className="position-card-demo">{t("jobs.demoPartner")}</span>}
       </div>

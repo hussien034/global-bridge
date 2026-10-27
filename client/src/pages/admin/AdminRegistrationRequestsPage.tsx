@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 type RegistrationRequest = {
   id: number;
@@ -23,12 +24,35 @@ const STATUS_LABELS: Record<RegistrationRequest["status"], string> = {
 };
 
 export default function AdminRegistrationRequestsPage() {
+  const { language, t } = useTranslation();
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [filter, setFilter] = useState<"all" | "partnership" | "admin_access">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
+
+  async function createAdmin(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setIsCreatingAdmin(true);
+    try {
+      await api.admin.createAdminUser({ name: adminName.trim(), email: adminEmail.trim(), password: adminPassword });
+      setAdminName("");
+      setAdminEmail("");
+      setAdminPassword("");
+      setSuccess(t("adminUsers.created"));
+    } catch (createError) {
+      setError(createError instanceof Error ? createError.message : t("adminUsers.error"));
+    } finally {
+      setIsCreatingAdmin(false);
+    }
+  }
 
   async function loadRequests() {
     try {
@@ -68,7 +92,7 @@ export default function AdminRegistrationRequestsPage() {
     }
   }
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: 24 }}>
         <h1 style={{ margin: "0 0 8px", fontSize: 26, color: "var(--text-primary)" }}>طلبات التسجيل والصلاحيات</h1>
@@ -76,6 +100,33 @@ export default function AdminRegistrationRequestsPage() {
           راجع طلبات الشراكة وطلبات صلاحية إدارة المنصة. اعتماد الطلب لا ينشئ الحساب تلقائياً؛ إصدار الحسابات يظل عبر إجراءات الإدارة الآمنة.
         </p>
       </div>
+
+      <section className="feature-card" style={{ marginBottom: 24 }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>{t("adminUsers.title")}</h2>
+        <p style={{ margin: "0 0 20px", color: "var(--text-secondary)" }}>{t("adminUsers.description")}</p>
+        {error && <div role="alert" style={{ padding: 12, marginBottom: 16, borderRadius: 10, color: "#B91C1C", background: "#FEF2F2" }}>{error}</div>}
+        {success && <div role="status" style={{ padding: 12, marginBottom: 16, borderRadius: 10, color: "#166534", background: "#F0FDF4" }}>{success}</div>}
+        <form onSubmit={createAdmin} className="auth-form">
+          <div className="auth-form-grid">
+            <div className="auth-field">
+              <label htmlFor="new-admin-name">{t("adminUsers.name")} *</label>
+              <input id="new-admin-name" className="input-field" value={adminName} onChange={(event) => setAdminName(event.target.value)} required minLength={2} maxLength={100} />
+            </div>
+            <div className="auth-field">
+              <label htmlFor="new-admin-email">{t("adminUsers.email")} *</label>
+              <input id="new-admin-email" type="email" autoComplete="email" className="input-field" value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)} required maxLength={254} />
+            </div>
+            <div className="auth-field profile-field-full">
+              <label htmlFor="new-admin-password">{t("adminUsers.password")} *</label>
+              <input id="new-admin-password" type="password" autoComplete="new-password" className="input-field" value={adminPassword} onChange={(event) => setAdminPassword(event.target.value)} required minLength={12} maxLength={128} />
+              <small>{t("adminUsers.passwordHint")}</small>
+            </div>
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={isCreatingAdmin}>
+            {isCreatingAdmin ? t("adminUsers.creating") : t("adminUsers.create")}
+          </button>
+        </form>
+      </section>
 
       <div className="feature-card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
@@ -90,8 +141,6 @@ export default function AdminRegistrationRequestsPage() {
           </label>
         </div>
 
-        {error && <div role="alert" style={{ padding: 12, marginBottom: 16, borderRadius: 10, color: "#B91C1C", background: "#FEF2F2" }}>{error}</div>}
-        {success && <div role="status" style={{ padding: 12, marginBottom: 16, borderRadius: 10, color: "#166534", background: "#F0FDF4" }}>{success}</div>}
         {isLoading ? (
           <p style={{ color: "var(--text-muted)" }}>جارٍ تحميل الطلبات...</p>
         ) : requests.length === 0 ? (
@@ -121,7 +170,7 @@ export default function AdminRegistrationRequestsPage() {
                   )}
                   {isAdminRequest && <p className="registration-request-reason">{request.message}</p>}
                   <div className="registration-request-footer">
-                    <time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleString("ar-EG")}</time>
+                    <time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleString(language === "ar" ? "ar-EG" : "en-GB")}</time>
                     <div className="registration-request-actions">
                       {request.status !== "contacted" && (
                         <button type="button" className="btn btn-outline" disabled={updatingId === request.id} onClick={() => updateStatus(request, "contacted")}>تم التواصل</button>
@@ -141,5 +190,5 @@ export default function AdminRegistrationRequestsPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

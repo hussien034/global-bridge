@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function AdminDashboardPage() {
+  const { language } = useTranslation();
   const [stats, setStats] = useState<any | null>(null);
   const [companiesList, setCompaniesList] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
@@ -70,7 +72,7 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       {/* Top Header */}
       <div className="feature-card" style={{ marginBottom: "24px" }}>
@@ -196,7 +198,7 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <div style={{ fontSize: "11px", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
-                    {act.createdAt ? new Date(act.createdAt).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" }) : "الآن"}
+                    {act.createdAt ? new Date(act.createdAt).toLocaleTimeString(language === "ar" ? "ar-EG" : "en-GB", { hour: "2-digit", minute: "2-digit" }) : "الآن"}
                   </div>
                 </div>
               ))}
@@ -205,5 +207,5 @@ export default function AdminDashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

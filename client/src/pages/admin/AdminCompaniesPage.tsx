@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function AdminCompaniesPage() {
+  const { t } = useTranslation();
   const [companies, setCompanies] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -11,6 +13,7 @@ export default function AdminCompaniesPage() {
   const [logoUrlDraft, setLogoUrlDraft] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [verifyingCompanyId, setVerifyingCompanyId] = useState<number | null>(null);
 
   const [newCompany, setNewCompany] = useState({
     name: "",
@@ -83,7 +86,7 @@ export default function AdminCompaniesPage() {
         setTimeout(() => setSuccessMsg(null), 3000);
       }
     } catch (err: any) {
-      alert(err.message || "فشل إضافة الشركة.");
+      alert(t(err.message || "فشل إضافة الشركة."));
     } finally {
       setIsSubmitting(false);
     }
@@ -108,7 +111,7 @@ export default function AdminCompaniesPage() {
       await loadCompanies();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
-      alert(err.message || "فشل تحديث شعار الشركة.");
+      alert(t(err.message || "فشل تحديث شعار الشركة."));
     } finally {
       setIsSubmitting(false);
     }
@@ -122,11 +125,25 @@ export default function AdminCompaniesPage() {
       loadCompanies();
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch (err: any) {
-      alert(err.message || "فشل تحديث الشركة.");
+      alert(t(err.message || "فشل تحديث الشركة."));
     }
   }
 
-  return (
+  async function handleVerifyCompany(companyId: number) {
+    setVerifyingCompanyId(companyId);
+    setError(null);
+    try {
+      await api.admin.updateCompany(companyId, { verificationStatus: "verified" });
+      setSuccessMsg(t("adminCompanies.verifySuccess"));
+      await loadCompanies();
+    } catch (verifyError) {
+      setError(verifyError instanceof Error ? verifyError.message : t("adminCompanies.verifyError"));
+    } finally {
+      setVerifyingCompanyId(null);
+    }
+  }
+
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -414,6 +431,16 @@ export default function AdminCompaniesPage() {
                     </span>
                   </td>
                   <td>
+                    {c.verificationStatus !== "verified" && (
+                      <button
+                        onClick={() => handleVerifyCompany(c.id)}
+                        className="btn btn-primary"
+                        disabled={verifyingCompanyId === c.id}
+                        style={{ padding: "4px 10px", fontSize: "12px", marginInlineEnd: "6px" }}
+                      >
+                        {verifyingCompanyId === c.id ? t("adminCompanies.verifying") : t("adminCompanies.verify")}
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setEditingLogoCompany(c);
@@ -439,5 +466,5 @@ export default function AdminCompaniesPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

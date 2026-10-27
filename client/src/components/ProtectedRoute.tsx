@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "../context/AuthContext";
 import type { AuthUser } from "../context/AuthContext";
+import { LocalizedContent } from "../i18n";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,7 +28,7 @@ export default function ProtectedRoute({
 
   // Still verifying session
   if (isLoading) {
-    return (
+    return <LocalizedContent>{(
       <div
         style={{
           display: "flex",
@@ -50,7 +51,7 @@ export default function ProtectedRoute({
         />
         <p style={{ color: "var(--text-secondary)", fontSize: "14px" }}>جارٍ التحقق من الجلسة…</p>
       </div>
-    );
+    )}</LocalizedContent>;
   }
 
   // Not authenticated → redirect to login
@@ -65,5 +66,5 @@ export default function ProtectedRoute({
     return null;
   }
 
-  return <>{children}</>;
+  return <LocalizedContent>{<>{children}</>}</LocalizedContent>;
 }

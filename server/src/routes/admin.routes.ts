@@ -20,6 +20,7 @@ import {
   changeApplicantStatusSchema,
   addApplicantNoteSchema,
   createTrainingSchema,
+  createAdminUserSchema,
   updateTrainingSchema,
 } from "@shared/validators";
 import { ZodError } from "zod";
@@ -34,6 +35,40 @@ class AccountEmailConflict extends Error {}
 
 // All admin routes require admin role
 adminRouter.use(requireAdmin);
+
+adminRouter.post("/users/admins", async (req, res) => {
+  try {
+    const input = createAdminUserSchema.parse(req.body);
+    const [account] = await db.insert(users).values({
+      name: input.name,
+      email: input.email.toLowerCase(),
+      passwordHash: await hashPassword(input.password),
+      role: "admin",
+      companyId: null,
+    }).onConflictDoNothing({ target: users.email }).returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    });
+
+    if (!account) {
+      return res.status(409).json({ success: false, error: "An account with this email already exists." });
+    }
+
+    console.log(`[Admin API] Admin account ${account.email} provisioned by admin #${req.sessionUser!.id}.`);
+    res.status(201).json({ success: true, data: account });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: error.errors[0]?.message || "Invalid administrator account details.",
+      });
+    }
+    console.error("[Admin API] Create administrator error:", error);
+    res.status(500).json({ success: false, error: "Unable to create the administrator account right now." });
+  }
+});
 
 // ==========================================
 // 1. Admin Dashboard

@@ -3,6 +3,8 @@ import { Link, useLocation } from "wouter";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import { useAuth } from "../context/AuthContext";
+import { LocalizedContent } from "../i18n";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  useScrollReveal(".dashboard-content-inner", location);
 
   const handleLogout = async () => {
     await logout();
@@ -28,7 +31,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { label: "سجل الأنشطة والمتابعة", href: "/admin/activity", icon: "⚡" },
   ];
 
-  return (
+  return <LocalizedContent>{(
     <div className="dashboard-shell admin-theme">
       {/* Required Admin Demo Banner */}
       <div className="dashboard-demo-banner admin-banner">
@@ -112,5 +115,5 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

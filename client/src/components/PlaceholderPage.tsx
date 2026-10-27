@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "wouter";
+import { LocalizedContent } from "../i18n";
 
 interface PlaceholderPageProps {
   title: string;
@@ -20,7 +21,7 @@ export default function PlaceholderPage({
   breadcrumbs = [],
   children,
 }: PlaceholderPageProps) {
-  return (
+  return <LocalizedContent>{(
     <div className="page-shell">
       {/* Breadcrumb Navigation */}
       {breadcrumbs.length > 0 && (
@@ -83,5 +84,5 @@ export default function PlaceholderPage({
         </div>
       )}
     </div>
-  );
+  )}</LocalizedContent>;
 }

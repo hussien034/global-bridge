@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem("gb-theme") === "light" ? "light" : "dark";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
     <meta name="description" content="منصة توظيف تربط المواهب التقنية في مصر بالشركات الدولية والفرص المهنية." />
     <link rel="icon" type="image/png" href="/images/global-bridge-favicon.png" />
     <title>Global Bridge — منصة توظيف الكوادر التقنية المصرية دولياً</title>

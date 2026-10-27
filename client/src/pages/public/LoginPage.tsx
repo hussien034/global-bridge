@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "wouter";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../services/api";
 import { useTranslation } from "../../i18n";
 
 const ROLE_REDIRECT: Record<string, string> = {
   company: "/company/dashboard",
   admin: "/admin",
-  candidate: "/jobs",
+  candidate: "/candidate/profile",
 };
 
-type RegistrationRole = "candidate" | "company" | "admin";
+type RegistrationRole = "candidate" | "company";
 
 export default function LoginPage() {
-  const { login, register, user } = useAuth();
+  const { login, register, registerCompany, user } = useAuth();
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,18 +22,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [website, setWebsite] = useState("");
   const [country, setCountry] = useState("");
-  const [rolesNeeded, setRolesNeeded] = useState("");
-  const [reason, setReason] = useState("");
-  const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [companyDescription, setCompanyDescription] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // If already logged in, redirect
-  if (user) {
+  useEffect(() => {
+    if (!user) return;
     const dest = ROLE_REDIRECT[user.role] ?? "/";
     setLocation(dest);
+  }, [setLocation, user]);
+
+  if (user) {
     return null;
   }
 
@@ -59,7 +62,11 @@ export default function LoginPage() {
           setError(t("auth.passwordMismatch"));
           return;
         }
-        const result = await register(name.trim(), email.trim(), password);
+        if (!photoFile) {
+          setError(t("profile.photoRequired"));
+          return;
+        }
+        const result = await register(name.trim(), email.trim(), password, photoFile);
         if (!result.success) {
           setError(result.error || t("common.error"));
           return;
@@ -68,24 +75,25 @@ export default function LoginPage() {
         return;
       }
 
-      if (registrationRole === "company") {
-        await api.public.submitPartnershipLead({
-          companyName: companyName.trim(),
-          contactPerson: name.trim(),
-          workEmail: email.trim(),
-          website: website.trim() || undefined,
-          country: country.trim(),
-          rolesNeeded: rolesNeeded.trim(),
-          message: t("auth.companyRequestMessage"),
-        });
-      } else {
-        await api.public.submitAdminAccessRequest({
-          name: name.trim(),
-          email: email.trim(),
-          reason: reason.trim(),
-        });
+      if (password !== confirmPassword) {
+        setError(t("auth.passwordMismatch"));
+        return;
       }
-      setRequestSubmitted(true);
+
+      const result = await registerCompany({
+        contactName: name.trim(),
+        email: email.trim(),
+        password,
+        companyName: companyName.trim(),
+        website: website.trim() || undefined,
+        country: country.trim(),
+        description: companyDescription.trim(),
+      });
+      if (!result.success) {
+        setError(result.error || t("common.error"));
+        return;
+      }
+      setLocation(ROLE_REDIRECT[result.role || "company"]);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("common.error"));
     } finally {
@@ -93,38 +101,47 @@ export default function LoginPage() {
     }
   };
 
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setPhotoFile(null);
+      setPhotoPreview(null);
+      setError(t("profile.photoTypeError"));
+      event.currentTarget.value = "";
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      setPhotoFile(null);
+      setPhotoPreview(null);
+      setError(t("profile.photoSizeError"));
+      event.currentTarget.value = "";
+      return;
+    }
+    setError(null);
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") setPhotoPreview(reader.result);
+    };
+    reader.onerror = () => setError(t("profile.photoReadError"));
+    reader.readAsDataURL(file);
+  };
+
   return (
-    <div className="container" style={{ padding: "48px 24px", maxWidth: "960px", margin: "0 auto" }}>
+    <div className="container auth-page-container">
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "48px" }}>
+      <div className="auth-page-header">
         <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "var(--card-bg)",
-            border: "1px solid var(--border-color)",
-            borderRadius: "100px",
-            padding: "6px 16px",
-            marginBottom: "20px",
-            fontSize: "13px",
-            color: "var(--text-secondary)",
-          }}
+          className="auth-page-badge"
         >
-          <span>🔐</span>
+          <span aria-hidden="true">✦</span>
           <span>{t("auth.badge")}</span>
         </div>
-        <h1
-          style={{
-            fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
-            fontWeight: 800,
-            color: "var(--cairo-ink)",
-            marginBottom: "12px",
-          }}
-        >
+        <h1>
           {t("auth.title")}
         </h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: "16px", maxWidth: "480px", margin: "0 auto" }}>
+        <p>
           {t("auth.intro")}
         </p>
       </div>
@@ -142,7 +159,7 @@ export default function LoginPage() {
           <button
             type="button"
             className={mode === "register" ? "btn btn-primary" : "btn btn-outline"}
-            onClick={() => { setMode("register"); setError(null); setRequestSubmitted(false); }}
+            onClick={() => { setMode("register"); setError(null); }}
             aria-pressed={mode === "register"}
           >
             {t("auth.register")}
@@ -155,41 +172,27 @@ export default function LoginPage() {
               <p>{t("auth.roleIntro")}</p>
             </div>
             <div className="auth-role-options">
-              <button type="button" className={`auth-role-choice${registrationRole === "candidate" ? " active" : ""}`} aria-pressed={registrationRole === "candidate"} onClick={() => { setRegistrationRole("candidate"); setError(null); setRequestSubmitted(false); }}>
+              <button type="button" className={`auth-role-choice${registrationRole === "candidate" ? " active" : ""}`} aria-pressed={registrationRole === "candidate"} onClick={() => { setRegistrationRole("candidate"); setError(null); }}>
                 <span className="auth-role-icon">👤</span>
                 <span><strong>{t("auth.candidate")}</strong><small>{t("auth.candidateDescription")}</small></span>
               </button>
-              <button type="button" className={`auth-role-choice${registrationRole === "company" ? " active" : ""}`} aria-pressed={registrationRole === "company"} onClick={() => { setRegistrationRole("company"); setError(null); setRequestSubmitted(false); }}>
+              <button type="button" className={`auth-role-choice${registrationRole === "company" ? " active" : ""}`} aria-pressed={registrationRole === "company"} onClick={() => { setRegistrationRole("company"); setError(null); }}>
                 <span className="auth-role-icon">🏢</span>
                 <span><strong>{t("auth.company")}</strong><small>{t("auth.companyDescription")}</small></span>
               </button>
-              <button type="button" className={`auth-role-choice${registrationRole === "admin" ? " active" : ""}`} aria-pressed={registrationRole === "admin"} onClick={() => { setRegistrationRole("admin"); setError(null); setRequestSubmitted(false); }}>
-                <span className="auth-role-icon">🛡️</span>
-                <span><strong>{t("auth.admin")}</strong><small>{t("auth.adminDescription")}</small></span>
-              </button>
+            </div>
+            <div className="auth-review-note" role="note">
+              <strong>{t("auth.adminProvisioningTitle")}</strong>
+              <span>{t("auth.adminProvisioningDescription")}</span>
             </div>
           </>
         )}
 
-        {requestSubmitted ? (
-          <div className="auth-request-success" role="status">
-            <span className="auth-success-icon">✓</span>
-            <h2>{registrationRole === "company" ? t("auth.requestReceivedCompany") : t("auth.requestReceivedAdmin")}</h2>
-            <p>
-              {registrationRole === "company"
-                ? t("auth.companyReceivedMessage", { company: companyName, email })
-                : t("auth.adminReceivedMessage", { email })}
-            </p>
-            <button type="button" className="btn btn-outline" onClick={() => { setMode("login"); setRequestSubmitted(false); }}>
-              {t("auth.backToLogin")}
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form">
             {mode === "register" && (
               <div className="auth-form-section-title">
-                <h2>{registrationRole === "candidate" ? t("auth.candidateForm") : registrationRole === "company" ? t("auth.companyForm") : t("auth.adminForm")}</h2>
-                <p>{registrationRole === "candidate" ? t("auth.candidateFormDescription") : t("auth.reviewFormDescription")}</p>
+                <h2>{registrationRole === "candidate" ? t("auth.candidateForm") : t("auth.companyForm")}</h2>
+                <p>{registrationRole === "candidate" ? t("auth.candidateFormDescription") : t("auth.companyFormDescription")}</p>
               </div>
             )}
 
@@ -215,23 +218,23 @@ export default function LoginPage() {
                   <label htmlFor="auth-country">{t("auth.country")} *</label>
                   <input id="auth-country" autoComplete="country-name" required minLength={2} value={country} onChange={(event) => setCountry(event.target.value)} className="input-field" />
                 </div>
-                <div className="auth-field">
-                  <label htmlFor="auth-roles">{t("auth.roles")} *</label>
-                  <input id="auth-roles" required minLength={2} placeholder="Backend, Frontend, DevOps" value={rolesNeeded} onChange={(event) => setRolesNeeded(event.target.value)} className="input-field" />
+                <div className="auth-field profile-field-full">
+                  <label htmlFor="auth-company-description">{t("auth.companyProfileDescription")} *</label>
+                  <textarea id="auth-company-description" required minLength={10} maxLength={2000} rows={4} value={companyDescription} onChange={(event) => setCompanyDescription(event.target.value)} className="input-field" placeholder={t("auth.companyProfileDescriptionHint")} />
                 </div>
               </div>
             )}
 
-            {mode === "register" && registrationRole !== "company" && (
+            {mode === "register" && registrationRole === "candidate" && (
               <div className="auth-field">
                 <label htmlFor="auth-name">{t("auth.name")} *</label>
                 <input id="auth-name" autoComplete="name" required minLength={2} maxLength={100} value={name} onChange={(event) => setName(event.target.value)} className="input-field" />
               </div>
             )}
 
-            {(mode === "login" || (mode === "register" && registrationRole !== "company")) && (
+            {(mode === "login" || (mode === "register" && registrationRole === "candidate")) && (
               <div className="auth-field">
-                <label htmlFor="auth-email">{t(mode === "register" && registrationRole === "company" ? "auth.workEmail" : "auth.email")} *</label>
+                <label htmlFor="auth-email">{t("auth.email")} *</label>
                 <input id="auth-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} className="input-field" />
               </div>
             )}
@@ -239,15 +242,40 @@ export default function LoginPage() {
             {mode === "login" && (
               <div className="auth-field">
                 <label htmlFor="auth-password">{t("auth.password")} *</label>
-                <input id="auth-password" type="password" autoComplete="current-password" required minLength={1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} className="input-field" />
+                <div className="auth-password-control">
+                  <input id="auth-password" type={showPassword ? "text" : "password"} autoComplete="current-password" required minLength={1} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} className="input-field" />
+                  <button type="button" className="auth-password-toggle" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}>{showPassword ? "◉" : "◎"}</button>
+                </div>
               </div>
             )}
 
             {mode === "register" && registrationRole === "candidate" && (
               <>
+                <div className="auth-photo-upload">
+                  <div className="auth-photo-preview">
+                    {photoPreview
+                      ? <img src={photoPreview} alt={t("profile.photoPreview")} />
+                      : <span aria-hidden="true">{name.trim().charAt(0) || "👤"}</span>}
+                  </div>
+                  <div className="auth-photo-field">
+                    <label htmlFor="auth-photo">{t("profile.photo")} *</label>
+                    <input
+                      id="auth-photo"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      required
+                      onChange={handlePhotoChange}
+                      className="input-field"
+                    />
+                    <small>{t("profile.photoFormats")}</small>
+                  </div>
+                </div>
                 <div className="auth-field">
                   <label htmlFor="auth-password">{t("auth.password")} *</label>
-                  <input id="auth-password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} className="input-field" />
+                  <div className="auth-password-control">
+                    <input id="auth-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={12} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} className="input-field" />
+                    <button type="button" className="auth-password-toggle" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}>{showPassword ? "◉" : "◎"}</button>
+                  </div>
                   <small>{t("auth.passwordHint")}</small>
                 </div>
                 <div className="auth-field">
@@ -257,21 +285,25 @@ export default function LoginPage() {
               </>
             )}
 
-            {mode === "register" && registrationRole === "admin" && (
-              <div className="auth-field">
-                <label htmlFor="auth-reason">{t("auth.reason")} *</label>
-                <textarea id="auth-reason" required minLength={20} maxLength={1000} rows={4} value={reason} onChange={(event) => setReason(event.target.value)} className="input-field" placeholder={t("auth.reasonPlaceholder")} />
-                <small>{t("auth.reasonHint")}</small>
-              </div>
-            )}
-
-            {mode === "register" && registrationRole !== "candidate" && (
-              <div className="auth-review-note" role="note">
-                <strong>{t("auth.reviewTitle")}</strong>
-                <span>{registrationRole === "company"
-                  ? t("auth.companyReview")
-                  : t("auth.adminReview")}</span>
-              </div>
+            {mode === "register" && registrationRole === "company" && (
+              <>
+                <div className="auth-field">
+                  <label htmlFor="auth-password">{t("auth.password")} *</label>
+                  <div className="auth-password-control">
+                    <input id="auth-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={12} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} className="input-field" />
+                    <button type="button" className="auth-password-toggle" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}>{showPassword ? "◉" : "◎"}</button>
+                  </div>
+                  <small>{t("auth.passwordHint")}</small>
+                </div>
+                <div className="auth-field">
+                  <label htmlFor="auth-confirm-password">{t("auth.confirmPassword")} *</label>
+                  <input id="auth-confirm-password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} className="input-field" />
+                </div>
+                <div className="auth-review-note" role="note">
+                  <strong>{t("auth.companyVerificationTitle")}</strong>
+                  <span>{t("auth.companyVerificationDescription")}</span>
+                </div>
+              </>
             )}
 
             <button type="submit" disabled={isSubmitting} className="btn btn-primary auth-submit">
@@ -279,12 +311,9 @@ export default function LoginPage() {
                 ? t("auth.login")
                 : registrationRole === "candidate"
                   ? t("auth.createCandidate")
-                  : registrationRole === "company"
-                    ? t("auth.submitCompany")
-                    : t("auth.submitAdmin")}
+                  : t("auth.createCompanyAccount")}
             </button>
           </form>
-        )}
       </section>
 
       {/* Error Banner */}
@@ -292,18 +321,7 @@ export default function LoginPage() {
         <div
           role="alert"
           aria-live="polite"
-          style={{
-            background: "#FEF2F2",
-            border: "1px solid #FECACA",
-            color: "#DC2626",
-            borderRadius: "12px",
-            padding: "14px 18px",
-            marginBottom: "24px",
-            fontSize: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
+          className="auth-error-banner"
         >
           <span>⚠️</span>
           <span>{error}</span>

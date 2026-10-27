@@ -7,20 +7,37 @@ export interface JobFilters {
   status?: "draft" | "active" | "paused" | "closed";
   department?: string;
   experienceLevel?: string;
+  search?: string;
   limit?: number;
   offset?: number;
+}
+
+function getPublicJobConditions(filters: Omit<JobFilters, "status" | "companyId" | "limit" | "offset"> = {}) {
+  const conditions = [eq(jobs.status, "active")];
+  if (filters.department) conditions.push(eq(jobs.department, filters.department));
+  if (filters.experienceLevel) conditions.push(eq(jobs.experienceLevel, filters.experienceLevel));
+
+  const search = filters.search?.trim().toLowerCase();
+  if (search) {
+    const searchCondition = or(
+      sql`instr(lower(${jobs.title}), ${search}) > 0`,
+      sql`instr(lower(${jobs.department}), ${search}) > 0`,
+      sql`instr(lower(${jobs.skills}), ${search}) > 0`,
+      sql`instr(lower(${companies.name}), ${search}) > 0`,
+    );
+    if (searchCondition) conditions.push(searchCondition);
+  }
+
+  return conditions;
 }
 
 export const jobsService = {
   // 1. List active jobs for public browsing with company details
   async listActiveJobs(filters: Omit<JobFilters, "status"> = {}) {
-    const limit = filters.limit ?? 50;
+    const limit = filters.limit ?? 12;
     const offset = filters.offset ?? 0;
-
-    const conditions = [eq(jobs.status, "active")];
+    const conditions = getPublicJobConditions(filters);
     if (filters.companyId) conditions.push(eq(jobs.companyId, filters.companyId));
-    if (filters.department) conditions.push(eq(jobs.department, filters.department));
-    if (filters.experienceLevel) conditions.push(eq(jobs.experienceLevel, filters.experienceLevel));
 
     return await db
       .select({
@@ -60,9 +77,20 @@ export const jobsService = {
       .from(jobs)
       .innerJoin(companies, eq(jobs.companyId, companies.id))
       .where(and(...conditions))
-      .orderBy(desc(jobs.isFeatured), desc(jobs.createdAt))
+      .orderBy(desc(jobs.isFeatured), desc(jobs.createdAt), desc(jobs.id))
       .limit(limit)
       .offset(offset);
+  },
+
+  async countActiveJobs(filters: Omit<JobFilters, "status" | "limit" | "offset" | "companyId"> = {}) {
+    const conditions = getPublicJobConditions(filters);
+    const [result] = await db
+      .select({ total: sql<number>`count(*)` })
+      .from(jobs)
+      .innerJoin(companies, eq(jobs.companyId, companies.id))
+      .where(and(...conditions));
+
+    return result.total;
   },
 
   // 2. List all jobs (for company or admin dashboards)

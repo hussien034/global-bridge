@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent } from "../../i18n";
 
 export default function AdminTrainingPage() {
   const [trainings, setTrainings] = useState<any[]>([]);
@@ -26,7 +27,7 @@ export default function AdminTrainingPage() {
     loadTrainings();
   }, []);
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -120,5 +121,5 @@ export default function AdminTrainingPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }

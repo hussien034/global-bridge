@@ -24,6 +24,13 @@ export async function bootstrapAdminAccount(): Promise<void> {
     if (existing.role !== "admin") {
       throw new Error("ADMIN_EMAIL is already used by a non-admin account.");
     }
+    if (!existing.passwordHash) {
+      await db
+        .update(users)
+        .set({ passwordHash: await hashPassword(password) })
+        .where(eq(users.email, email));
+      console.log(`[Auth] Backfilled password hash for admin account ${email}.`);
+    }
     return;
   }
 

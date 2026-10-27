@@ -19,6 +19,7 @@ export interface AuthUser {
   companyId: number | null;
   companyName: string | null;
   isDemo: boolean;
+  profileComplete: boolean;
 }
 
 interface AuthContextValue {
@@ -27,7 +28,9 @@ interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }>;
-  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }>;
+  register: (name: string, email: string, password: string, photoFile: File) => Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }>;
+  registerCompany: (input: { contactName: string; email: string; password: string; companyName: string; website?: string; country: string; description: string }) => Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }>;
+  updateUserProfile: (name: string, companyName?: string) => void;
   logout: () => Promise<void>;
   hasRole: (...roles: AuthUser["role"][]) => boolean;
 }
@@ -107,13 +110,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }> => {
+    async (name: string, email: string, password: string, photoFile: File): Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }> => {
       try {
+        const fileData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result !== "string") {
+              reject(new Error("Could not read the selected photo."));
+              return;
+            }
+            resolve(reader.result.split(",")[1] ?? "");
+          };
+          reader.onerror = () => reject(new Error("Could not read the selected photo."));
+          reader.readAsDataURL(photoFile);
+        });
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            photoFile: { name: photoFile.name, mimeType: photoFile.type, data: fileData },
+          }),
         });
         const data = await res.json();
         if (res.ok && data.success && data.user) {
@@ -123,12 +143,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { success: true, role: data.user.role };
         }
         return { success: false, error: data.error ?? "تعذّر إنشاء الحساب." };
-      } catch {
-        return { success: false, error: "تعذّر الاتصال بالسيرفر." };
+      } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : "تعذّر إنشاء الحساب." };
       }
     },
     []
   );
+
+  const updateUserProfile = useCallback((name: string, companyName?: string) => {
+    setUser((currentUser) => currentUser
+      ? { ...currentUser, name, ...(companyName ? { companyName } : {}), profileComplete: true }
+      : currentUser);
+  }, []);
+
+  const registerCompany = useCallback(async (input: {
+    contactName: string;
+    email: string;
+    password: string;
+    companyName: string;
+    website?: string;
+    country: string;
+    description: string;
+  }): Promise<{ success: boolean; error?: string; role?: AuthUser["role"] }> => {
+    try {
+      const res = await fetch("/api/auth/register/company", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(input),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success || !data.user) {
+        return { success: false, error: data.error ?? "Unable to create the company account." };
+      }
+
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("gb_token", data.token);
+      return { success: true, role: data.user.role };
+    } catch {
+      return { success: false, error: "Could not connect to the server." };
+    }
+  }, []);
 
   // ----------------------------------------
   // logout
@@ -169,6 +225,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         login,
         register,
+        registerCompany,
+        updateUserProfile,
         logout,
         hasRole,
       }}

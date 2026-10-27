@@ -12,6 +12,7 @@ export interface SessionUser {
   companyId: number | null;
   companyName: string | null;
   isDemo: boolean;
+  profileComplete: boolean;
 }
 
 // Extend Express Request to carry session user

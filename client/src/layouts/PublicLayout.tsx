@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import { useTranslation } from "../i18n";
+import { useAuth } from "../context/AuthContext";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 
 interface PublicLayoutProps {
   children: React.ReactNode;
 }
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
+  const accountHref = user?.role === "company"
+    ? "/company/dashboard"
+    : user?.role === "admin"
+      ? "/admin"
+      : "/candidate/profile";
 
   const navLinks = [
     { label: t("nav.home"), href: "/" },
@@ -22,13 +30,29 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     { label: t("nav.about"), href: "/about" },
   ];
 
+  const handleLogout = async () => {
+    await logout();
+    setMobileMenuOpen(false);
+    setLocation("/login");
+  };
+
+  const accountLabel = user
+    ? `${user.name} · ${t(`nav.${user.role}Role`)}`
+    : t("nav.login");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  useScrollReveal(".public-content", location);
+
   return (
     <div className="site-wrapper">
       {/* Main Header */}
       <header className="navbar">
         <div className="container nav-container">
-          <Link href="/">
-            <Logo size="sm" />
+          <Link href="/" className="navbar-brand-link" aria-label={t("site.title")}>
+            <Logo size="sm" className="nav-brand" />
           </Link>
 
           {/* Desktop Nav */}
@@ -50,11 +74,21 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
           {/* Header Action Tools */}
           <div className="header-actions">
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <Link href="/login" className="btn btn-outline navbar-login-btn">
-              {t("nav.login")}
+            <LanguageSwitcher className="navbar-control" />
+            <ThemeToggle className="navbar-control" />
+            <Link
+              href={user ? accountHref : "/login"}
+              className="btn btn-outline navbar-login-btn"
+              aria-label={accountLabel}
+              title={accountLabel}
+            >
+              {accountLabel}
             </Link>
+            {user && (
+              <button type="button" className="btn btn-outline navbar-logout-btn" onClick={handleLogout}>
+                {t("nav.logout")}
+              </button>
+            )}
             <Link href="/jobs" className="btn btn-primary navbar-apply-btn">
               {t("nav.apply")}
             </Link>
@@ -90,11 +124,21 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
             ))}
           </nav>
           <div className="mobile-public-menu-actions">
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <Link href="/login" className="btn btn-outline" onClick={() => setMobileMenuOpen(false)}>
-              {t("nav.login")}
+            <LanguageSwitcher className="navbar-control" />
+            <ThemeToggle className="navbar-control" />
+            <Link
+              href={user ? accountHref : "/login"}
+              className="btn btn-outline mobile-account-link"
+              aria-label={accountLabel}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {accountLabel}
             </Link>
+            {user && (
+              <button type="button" className="btn btn-outline mobile-logout-btn" onClick={handleLogout}>
+                {t("nav.logout")}
+              </button>
+            )}
             <Link href="/jobs" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>
               {t("nav.apply")}
             </Link>
@@ -137,7 +181,18 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
               <li><Link href="/companies">{t("nav.hiringPartnerships")}</Link></li>
               <li><Link href="/company/dashboard">{t("nav.companyWorkspace")}</Link></li>
               <li><Link href="/admin">{t("nav.adminDashboard")}</Link></li>
-              <li><Link href="/login">{t("nav.login")}</Link></li>
+              {user ? (
+                <>
+                  <li><Link href={accountHref}>{accountLabel}</Link></li>
+                  <li>
+                    <button type="button" className="footer-logout-link" onClick={handleLogout}>
+                      {t("nav.logout")}
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li><Link href="/login">{t("nav.login")}</Link></li>
+              )}
             </ul>
           </div>
         </div>

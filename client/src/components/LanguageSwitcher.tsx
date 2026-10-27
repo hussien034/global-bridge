@@ -1,22 +1,22 @@
 import React from "react";
-import { useTranslation } from "../i18n";
+import { useTranslation, LocalizedContent } from "../i18n";
 
 interface LanguageSwitcherProps {
   className?: string;
 }
 
 export default function LanguageSwitcher({ className }: LanguageSwitcherProps) {
-  const { language, setLanguage, t } = useTranslation();
+  const { language, setLanguage } = useTranslation();
 
-  return (
+  return <LocalizedContent>{(
     <button
       type="button"
-      className={className ?? "language-switcher"}
+      className={`language-switcher${className ? ` ${className}` : ""}`}
       onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
       aria-label={language === "ar" ? "Switch language to English" : "غيّر اللغة إلى العربية"}
       lang={language === "ar" ? "en" : "ar"}
     >
-      {t("common.language")}
+      {language === "ar" ? "EN" : "AR"}
     </button>
-  );
+  )}</LocalizedContent>;
 }

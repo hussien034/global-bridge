@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { api } from "../../services/api";
+import { LocalizedContent, useTranslation } from "../../i18n";
 
 export default function AdminApplicantsPage() {
+  const { language } = useTranslation();
   const [applicants, setApplicants] = useState<any[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +41,7 @@ export default function AdminApplicantsPage() {
     { label: "اعتذار (Rejected)", value: "rejected" },
   ];
 
-  return (
+  return <LocalizedContent>{(
     <div className="container" style={{ padding: "32px 24px" }}>
       <div className="feature-card" style={{ marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
@@ -127,7 +129,7 @@ export default function AdminApplicantsPage() {
                     </span>
                   </td>
                   <td style={{ fontSize: "13px", color: "var(--text-muted)" }}>
-                    {a.createdAt ? new Date(a.createdAt).toLocaleDateString("ar-EG") : "—"}
+                    {a.createdAt ? new Date(a.createdAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-GB") : "—"}
                   </td>
                 </tr>
               ))}
@@ -136,5 +138,5 @@ export default function AdminApplicantsPage() {
         )}
       </div>
     </div>
-  );
+  )}</LocalizedContent>;
 }
